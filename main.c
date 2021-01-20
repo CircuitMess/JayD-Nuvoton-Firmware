@@ -73,20 +73,20 @@ bool previousEncoder4State = false;
 bool previousEncoder5State = false;
 bool previousEncoder6State = false;
 
-uint8_t encoder0Pos = 0;
-uint8_t encoder0LastPos = 0;
-uint8_t encoder1Pos = 0;
-uint8_t encoder1LastPos = 0;
-uint8_t encoder2Pos = 0;
-uint8_t encoder2LastPos = 0;
-uint8_t encoder3Pos = 0;
-uint8_t encoder3LastPos = 0;
-uint8_t encoder4Pos = 0;
-uint8_t encoder4LastPos = 0;
-uint8_t encoder5Pos = 0;
-uint8_t encoder5LastPos = 0;
-uint8_t encoder6Pos = 0;
-uint8_t encoder6LastPos = 0;
+signed int encoder0Pos = 0;
+signed int encoder0LastPos = 0;
+signed int encoder1Pos = 0;
+signed int encoder1LastPos = 0;
+signed int encoder2Pos = 0;
+signed int encoder2LastPos = 0;
+signed int encoder3Pos = 0;
+signed int encoder3LastPos = 0;
+signed int encoder4Pos = 0;
+signed int encoder4LastPos = 0;
+signed int encoder5Pos = 0;
+signed int encoder5LastPos = 0;
+signed int encoder6Pos = 0;
+signed int encoder6LastPos = 0;
 
 signed int deltaEnc = 0;
 
@@ -231,18 +231,14 @@ void main(void){
 	ENCODER_SW_INPUT_MODE_INIT();
 	
 	initI2C();														// Initialize i2c communication
-	/*
+/*
 	INIT_ADC_SLIDER0();
-	slider0Value = sliderRead();
-	slider0LastValue = slider0Value;
+	slider0LastValue = slider0Value = sliderRead();
 	INIT_ADC_SLIDER1();
-	slider1Value = sliderRead();
-	slider1LastValue = slider1Value;
+	slider1LastValue = slider1Value = sliderRead();
 	INIT_ADC_SLIDER2();
-	slider2Value = sliderRead();
-	slider2LastValue = slider2Value;
+	slider2LastValue = slider2Value = sliderRead();
 	*/
-	
 	previousEncoder0State = ENCODER0_A;
 	previousEncoder1State = ENCODER1_A;
 	previousEncoder2State = ENCODER2_A;
@@ -521,7 +517,8 @@ void checkSliderPosition(){
 
 	INIT_ADC_SLIDER0();
 	slider0Value = sliderRead();
-	if(slider0Value != slider0LastValue){
+	//if(slider0Value != slider0LastValue){
+	if(abs(slider0Value - slider0LastValue) > 4 ){
 	
 		//searchList(0x20);
 		addNewNode(0x20, slider0Value);
@@ -531,7 +528,7 @@ void checkSliderPosition(){
 
 	INIT_ADC_SLIDER1();
 	slider1Value = sliderRead();
-	if(slider1Value != slider1LastValue){
+	if(abs(slider1Value - slider1LastValue) > 4 ){
 		
 		//searchList(0x21);
 		addNewNode(0x21, slider0Value);
@@ -541,7 +538,7 @@ void checkSliderPosition(){
 
 	INIT_ADC_SLIDER2();
 	slider2Value = sliderRead();
-	if(slider2Value != slider2LastValue){
+	if(abs(slider2Value - slider2LastValue) > 4 ){
 		
 		//searchList(0x22);
 		addNewNode(0x22, slider0Value);
@@ -560,7 +557,7 @@ void checkEncoderPosition(void){
 	
 	if(previousEncoder0State != ENCODER0_A){
 		
-		if(ENCODER0_B == 0)
+		if(ENCODER0_B != ENCODER0_A)
 			encoder0Pos++;
 		else
 			encoder0Pos--;
@@ -577,7 +574,7 @@ void checkEncoderPosition(void){
 	
 	if(previousEncoder1State != ENCODER1_A){
 	
-		if(ENCODER1_B == 0)
+		if(ENCODER1_B != ENCODER1_A)
 			encoder1Pos++;
 		else
 			encoder1Pos--;
@@ -595,7 +592,7 @@ void checkEncoderPosition(void){
 	
 	if(previousEncoder2State != ENCODER2_A){
 	
-		if(ENCODER2_B == 0)
+		if(ENCODER2_B != ENCODER2_A)
 			encoder2Pos++;
 		else
 			encoder2Pos--;
@@ -612,7 +609,7 @@ void checkEncoderPosition(void){
 	
 	if(previousEncoder3State != ENCODER3_A){
 	
-		if(ENCODER3_B == 0)
+		if(ENCODER3_B != ENCODER3_A)
 			encoder3Pos++;
 		else
 			encoder3Pos--;
@@ -630,7 +627,7 @@ void checkEncoderPosition(void){
 	
 	if(previousEncoder4State != ENCODER4_A){
 	
-		if(ENCODER4_B == 0)
+		if(ENCODER4_B != ENCODER4_A)
 			encoder4Pos++;
 		else
 			encoder4Pos--;
@@ -649,7 +646,7 @@ void checkEncoderPosition(void){
 	
 	if(previousEncoder5State != ((P4>>6 && 0x01))){
 	
-		if(ENCODER5_B == 0)
+		if(ENCODER5_B != ((P4>>6 && 0x01)))
 			encoder5Pos++;
 		else
 			encoder5Pos--;
@@ -665,7 +662,7 @@ void checkEncoderPosition(void){
 	
 	if(previousEncoder6State != ENCODER6_A){
 	
-		if(ENCODER6_B == 0)
+		if(ENCODER6_B != ENCODER6_A)
 			encoder6Pos++;
 		else
 			encoder6Pos--;
