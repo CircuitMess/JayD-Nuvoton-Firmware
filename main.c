@@ -23,6 +23,8 @@
 
 #define		STATUS_UPDATE		0x12			//	18_(10)
 #define		EVENT_HANDLER		0x13			//	19_(10)
+	
+#define		DEBOUNCE_TIME		10				//	10 ms
 
 
 typedef struct Node{
@@ -99,7 +101,6 @@ uint8_t slider2LastValue = 0;
 
 bool switchEvent[9] = {false,false,false,false,false,false,false,false,false};
 bool sliderEvent[3] = {false,false,false};
-
 
 void I2C_ISR(void) interrupt 6
 {
@@ -531,7 +532,7 @@ void checkSliderPosition(){
 	if(abs(slider1Value - slider1LastValue) > 4 ){
 		
 		//searchList(0x21);
-		addNewNode(0x21, slider0Value);
+		addNewNode(0x21, slider1Value);
 		
 		slider1LastValue = slider1Value;
 	}
@@ -541,7 +542,7 @@ void checkSliderPosition(){
 	if(abs(slider2Value - slider2LastValue) > 4 ){
 		
 		//searchList(0x22);
-		addNewNode(0x22, slider0Value);
+		addNewNode(0x22, slider2Value);
 		
 		slider2LastValue = slider2Value;
 	}
