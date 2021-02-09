@@ -39,12 +39,15 @@ struct Node *rootNode = NULL;
 struct Node *eventNode = NULL;
 uint8_t nodeNum = 0;
 
-int searchList(uint8_t searchID);
+//int searchList(uint8_t searchID);
 uint8_t getNodeNumber();	
 void addNewNode(uint8_t devID, uint8_t val);
 
 void initI2C();
-void debounce(uint8_t number, bool state);
+
+void debounce(uint8_t num, bool val);
+void encoders(uint8_t num);
+void sliders();
 	
 void checkSwitchStatus(void);
 void checkEncoderPosition(void);
@@ -66,44 +69,15 @@ uint8_t expectedEventsInQueue = 0;
 uint8_t switchStatus = 0;
 uint8_t encoderSwitchStatus = 0;
 
-bool previousEncoder0State = false;
-bool previousEncoder1State = false;
-bool previousEncoder2State = false;
-bool previousEncoder3State = false;
-bool previousEncoder4State = false;
-bool previousEncoder5State = false;
-bool previousEncoder6State = false;
-
-signed int encoder0Pos = 0;
-signed int encoder0LastPos = 0;
-signed int encoder1Pos = 0;
-signed int encoder1LastPos = 0;
-signed int encoder2Pos = 0;
-signed int encoder2LastPos = 0;
-signed int encoder3Pos = 0;
-signed int encoder3LastPos = 0;
-signed int encoder4Pos = 0;
-signed int encoder4LastPos = 0;
-signed int encoder5Pos = 0;
-signed int encoder5LastPos = 0;
-signed int encoder6Pos = 0;
-signed int encoder6LastPos = 0;
-
-signed int deltaEnc = 0;
+bool previousEncoderState[7] = {false};
+signed int encoderPos[7] = {0};
+signed int encoderLastPos[7] = {0};
 
 uint8_t sliderValue[3] = {0};
 uint8_t sliderLastValue[3] = {0};
 
-/*
-uint8_t slider0Value = 0;
-uint8_t slider0LastValue = 0;
-uint8_t slider1Value = 0;
-uint8_t slider1LastValue = 0;
-uint8_t slider2Value = 0;
-uint8_t slider2LastValue = 0;
-*/
 bool switchEvent[9] = {false};
-bool sliderEvent[3] = {false};
+//bool sliderEvent[3] = {false};
 
 uint16_t btnCount[9] = {0};
 
@@ -231,7 +205,6 @@ void I2C_ISR(void) interrupt 6
 
 void main(void){
 	
-	
 	Set_All_GPIO_Quasi_Mode;
 
 	SW_INPUT_MODE_INIT();
@@ -246,19 +219,20 @@ void main(void){
 	INIT_ADC_SLIDER2();
 	sliderLastValue[2] = sliderValue[2] = sliderRead();
 	
-	previousEncoder0State = ENCODER0_A;
-	previousEncoder1State = ENCODER1_A;
-	previousEncoder2State = ENCODER2_A;
-	previousEncoder3State = ENCODER3_A;
-	previousEncoder4State = ENCODER4_A;
-	previousEncoder5State = ENCODER5_A;
-	previousEncoder6State = ENCODER6_A;
+	previousEncoderState[0] = ENCODER0_A;
+	previousEncoderState[1] = ENCODER1_A;
+	previousEncoderState[2] = ENCODER2_A;
+	previousEncoderState[3] = ENCODER3_A;
+	previousEncoderState[4] = ENCODER4_A;
+	previousEncoderState[5] = ENCODER5_A;
+	previousEncoderState[6] = ENCODER6_A;
 	
 	while(1){
 		
 		checkSwitchStatus();
 		checkEncoderPosition();
-		checkSliderPosition();
+		//checkSliderPosition();
+		sliders();
 	}
 }
 
@@ -283,6 +257,7 @@ void initI2C(){
 	
 }
 
+/*
 int searchList(uint8_t searchID){
 
 	struct Node *temp = rootNode;
@@ -310,7 +285,7 @@ int searchList(uint8_t searchID){
 	
 	return 0;
 }
-
+*/
 
 uint8_t getNodeNumber(){
 
@@ -376,25 +351,25 @@ unsigned int sliderRead(){
 	return sliderValue/4;
 }
 
-void debounce(uint8_t number, bool state){
+void debounce(uint8_t num, bool val){
 
-	if(state){
-		btnCount[number]++;
+	if(val){
+		btnCount[num]++;
 		
-		if(btnCount[number] == DEBOUNCE_COUNTER){
+		if(btnCount[num] == DEBOUNCE_COUNTER){
 			
-			switchEvent[number] = true;		
-			addNewNode(number, state);
+			switchEvent[num] = true;		
+			addNewNode(num, val);
 
 		}
 	}
 	else{
-		btnCount[number]--;
+		btnCount[num]--;
 		
-		if(btnCount[number] == 0){
+		if(btnCount[num] == 0){
 		
-			switchEvent[number] = false;
-			addNewNode(number, state);
+			switchEvent[num] = false;
+			addNewNode(num, val);
 			
 		}
 	}
@@ -415,6 +390,8 @@ void checkSwitchStatus(){
 	
 	
 	if(!SW1 && !switchEvent[1]){
+		debounce(1, 1);
+		/*
 		btnCount[1]++;
 		
 		if(btnCount[1] == DEBOUNCE_COUNTER){
@@ -423,9 +400,12 @@ void checkSwitchStatus(){
 			switchEvent[1] = true;
 		
 		}
+		*/
 	}
 	else{
 		if(SW1 && switchEvent[1]){
+			debounce(1, 0);
+			/*
 			btnCount[1]--;
 			
 			if(btnCount[1] == 0){
@@ -433,166 +413,114 @@ void checkSwitchStatus(){
 				addNewNode(1, 0);
 				switchEvent[1] = false;
 			}
-			
+			*/
 		}
 	}
 						
 	if(!ENCODER_SW_0 && !switchEvent[2]){
-		btnCount[2]++;
 		
-		if(btnCount[2] == DEBOUNCE_COUNTER){
-		
-			addNewNode(2, 1);
-			switchEvent[2] = true;
-		
-		}
+		debounce(2, 1);
 	}
 	else{
 		if(ENCODER_SW_0 && switchEvent[2]){
-			btnCount[2]--;
 			
-			if(btnCount[2] == 0){
-			
-				addNewNode(2, 0);
-				switchEvent[2] = false;
-			}	
+			debounce(2, 0);
 		}
 	}
 	
 	if(!ENCODER_SW_1 && !switchEvent[3]){
-		btnCount[3]++;
 		
-		if(btnCount[3] == DEBOUNCE_COUNTER){
-		
-			addNewNode(3, 1);
-			switchEvent[3] = true;
-		
-		}
+		debounce(3, 1);
 	}
 	else{
 		if(ENCODER_SW_1 && switchEvent[3]){
-			btnCount[3]--;
 			
-			if(btnCount[3] == 0){
-			
-				addNewNode(3, 0);
-				switchEvent[3] = false;
-			}	
+			debounce(3, 0);			
 		}
 	}
 	
 	if(!ENCODER_SW_2 && !switchEvent[4]){
-		btnCount[4]++;
 		
-		if(btnCount[4] == DEBOUNCE_COUNTER){
-		
-			addNewNode(4, 1);
-			switchEvent[4] = true;
-		
-		}
+		debounce(4, 1);
 	}
 	else{
 		if(ENCODER_SW_2 && switchEvent[4]){
-			btnCount[4]--;
 			
-			if(btnCount[4] == 0){
-			
-				addNewNode(4, 0);
-				switchEvent[4] = false;
-			}
+			debounce(4, 0);
 		}
 	}
 	
 	if(!ENCODER_SW_3 && !switchEvent[5]){
-		btnCount[5]++;
 		
-		if(btnCount[5] == DEBOUNCE_COUNTER){
-		
-			addNewNode(5, 1);
-			switchEvent[5] = true;
-		
-		}
+		debounce(5, 1);
 	}
 	else{
 		if(ENCODER_SW_3 && switchEvent[5]){
-			btnCount[5]--;
 			
-			if(btnCount[5] == 0){
-			
-				addNewNode(5, 0);
-				switchEvent[5] = false;
-			}
+			debounce(5, 0);
 		}
 	}
 	
 	if(!ENCODER_SW_4 && !switchEvent[6]){
-		btnCount[6]++;
 		
-		if(btnCount[6] == DEBOUNCE_COUNTER){
-		
-			addNewNode(6, 1);
-			switchEvent[6] = true;
-		
-		}
+		debounce(6, 1);
 	}
 	else{
 		if(ENCODER_SW_4 && switchEvent[6]){
-			btnCount[6]--;
 			
-			if(btnCount[6] == 0){
-			
-				addNewNode(6, 0);
-				switchEvent[6] = false;
-			}
+			debounce(6, 0);
 		}
 	}
 		
 	if(((P4>>5 & 0x01) != 0x01)  && !switchEvent[7]){							//	register P4 only byte addressable
-		btnCount[7]++;
 		
-		if(btnCount[7] == DEBOUNCE_COUNTER){
-		
-			addNewNode(7, 1);
-			switchEvent[7] = true;
-		
-		}
+		debounce(7, 1);
 	}
 	else{
 		if(((P4>>5 & 0x01) == 0x01) && switchEvent[7]){
-			btnCount[7]--;
 			
-			if(btnCount[7] == 0){
-			
-				addNewNode(7, 0);
-				switchEvent[7] = false;
-			}
+			debounce(7, 0);
 		}
 	}
 	
 	if(!ENCODER_SW_6 && !switchEvent[8]){
-		btnCount[8]++;
 		
-		if(btnCount[8] == DEBOUNCE_COUNTER){
-		
-			addNewNode(8, 1);
-			switchEvent[8] = true;
-		
-		}
+		debounce(8, 1);
 	}
 	else{
 		if(ENCODER_SW_6 && switchEvent[8]){
-			btnCount[8]--;
 			
-			if(btnCount[8] == 0){
-			
-				addNewNode(8, 0);
-				switchEvent[8] = false;
-			}
+			debounce(8, 0);
 		}
 	}
 }
 
+void sliders(){
+	
+	uint8_t i;
+	
+	for(i = 0; i < 3; i++){
+	
+		if(i == 0)
+			INIT_ADC_SLIDER0();
+		if(i == 1)
+			INIT_ADC_SLIDER1();
+		if(i == 2)
+			INIT_ADC_SLIDER2();
+		
+		sliderValue[i] = sliderRead();
+	
+		if(abs(sliderValue[i] - sliderLastValue[i]) > 4 ){
+	
+			addNewNode((0x20 | i), sliderValue[i]);
+		
+			sliderLastValue[i] = sliderValue[i];
+		}
+		
+	}
 
+}
+/*
 void checkSliderPosition(){
 
 	INIT_ADC_SLIDER0();
@@ -629,125 +557,144 @@ void checkSliderPosition(){
 	}
 
 }
+*/
+/*
+void encoders(uint8_t num){
 
+	if(previousEncoderState[num] != encoderA[num]){
+		
+		if(encoderB[num] != encoderA[num])
+			encoderPos[num]++;
+		else
+			encoderPos[num]--;
+		
+		addNewNode((0x10 | num), (signed int)(encoderPos[num]-encoderLastPos[num]));
+	
+		encoderLastPos[num] = encoderPos[num];
+	
+		previousEncoderState[num] = encoderA[num];
+	}
 
+}
+*/
 void checkEncoderPosition(void){
 
-	if(previousEncoder0State != ENCODER0_A){
+	if(previousEncoderState[0] != ENCODER0_A){
 		
 		if(ENCODER0_B != ENCODER0_A)
-			encoder0Pos++;
+			encoderPos[0]++;
 		else
-			encoder0Pos--;
+			encoderPos[0]--;
 		
 		//searchList(0x10);
-		addNewNode(0x10, (signed int)(encoder0Pos-encoder0LastPos));
+		addNewNode(0x10, (signed int)(encoderPos[0]-encoderLastPos[0]));
 	
-		encoder0LastPos = encoder0Pos;
+		encoderLastPos[0] = encoderPos[0];
 	
-		previousEncoder0State = ENCODER0_A;
+		previousEncoderState[0] = ENCODER0_A;
 	}
 	
 	
 	
-	if(previousEncoder1State != ENCODER1_A){
+	if(previousEncoderState[1] != ENCODER1_A){
 	
 		if(ENCODER1_B != ENCODER1_A)
-			encoder1Pos++;
+			encoderPos[1]++;
 		else
-			encoder1Pos--;
+			encoderPos[1]--;
 		
 		//searchList(0x11);
-		addNewNode(0x11, (signed int)(encoder1Pos-encoder1LastPos));
+		addNewNode(0x11, (signed int)(encoderPos[1]-encoderLastPos[1]));
 		
-		encoder1LastPos = encoder1Pos;
+		encoderLastPos[1] = encoderPos[1];
 	
-		previousEncoder1State = ENCODER1_A;
+		previousEncoderState[1] = ENCODER1_A;
 	}
 	
 
 	
 	
-	if(previousEncoder2State != ENCODER2_A){
+	if(previousEncoderState[2] != ENCODER2_A){
 	
 		if(ENCODER2_B != ENCODER2_A)
-			encoder2Pos++;
+			encoderPos[2]++;
 		else
-			encoder2Pos--;
+			encoderPos[2]--;
 		
 		//searchList(0x12);
-		addNewNode(0x12, (signed int)(encoder2Pos-encoder2LastPos));
+		addNewNode(0x12, (signed int)(encoderPos[2]-encoderLastPos[2]));
 		
-		encoder2LastPos = encoder2Pos;
+		encoderLastPos[2] = encoderPos[2];
 	
-		previousEncoder2State = ENCODER2_A;
+		previousEncoderState[2] = ENCODER2_A;
 	}
 	
 
 	
-	if(previousEncoder3State != ENCODER3_A){
+	if(previousEncoderState[3] != ENCODER3_A){
 	
 		if(ENCODER3_B != ENCODER3_A)
-			encoder3Pos++;
+			encoderPos[3]++;
 		else
-			encoder3Pos--;
+			encoderPos[3]--;
 		
 		//searchList(0x13);
-		addNewNode(0x13, (signed int)(encoder3Pos-encoder3LastPos));
+		addNewNode(0x13, (signed int)(encoderPos[3]-encoderLastPos[3]));
 		
-		encoder3LastPos = encoder3Pos;
+		encoderLastPos[3] = encoderPos[3];
 	
-		previousEncoder3State = ENCODER3_A;
+		previousEncoderState[3] = ENCODER3_A;
 	}
 	
 
 	
 	
-	if(previousEncoder4State != ENCODER4_A){
+	if(previousEncoderState[4] != ENCODER4_A){
 	
 		if(ENCODER4_B != ENCODER4_A)
-			encoder4Pos++;
+			encoderPos[4]++;
 		else
-			encoder4Pos--;
+			encoderPos[4]--;
 		
 		//searchList(0x14);
-		addNewNode(0x14, (signed int)(encoder4Pos-encoder4LastPos));
+		addNewNode(0x14, (signed int)(encoderPos[4]-encoderLastPos[4]));
 		
-		encoder4LastPos = encoder4Pos;
+		encoderLastPos[4] = encoderPos[4];
 	
-		previousEncoder4State = ENCODER4_A;
+		previousEncoderState[4] = ENCODER4_A;
 	}
 	
 		
-	if(previousEncoder5State != ((P4>>6 && 0x01))){
+	if(previousEncoderState[5] != ((P4>>6 && 0x01))){
 	
 		if(ENCODER5_B != ((P4>>6 && 0x01)))
-			encoder5Pos++;
+			encoderPos[5]++;
 		else
-			encoder5Pos--;
+			encoderPos[5]--;
 		
 		//searchList(0x15);
-		addNewNode(0x15, (signed int)(encoder5Pos-encoder5LastPos));
+		addNewNode(0x15, (signed int)(encoderPos[5]-encoderLastPos[5]));
 		
-		encoder5LastPos = encoder5Pos;
+		encoderLastPos[5] = encoderPos[5];
 	
-		previousEncoder5State = (P4>>6 && 0x01);
+		//previousEncoderState[5] = (P4>>6 && 0x01);
+		previousEncoderState[5] = ENCODER5_A;
 	}
 	
 	
-	if(previousEncoder6State != ENCODER6_A){
+	if(previousEncoderState[6] != ENCODER6_A){
 	
 		if(ENCODER6_B != ENCODER6_A)
-			encoder6Pos++;
+			encoderPos[6]++;
 		else
-			encoder6Pos--;
+			encoderPos[6]--;
 		
 		//searchList(0x16);
-		addNewNode(0x16, (signed int)(encoder6Pos-encoder6LastPos));
+		addNewNode(0x16, (signed int)(encoderPos[6]-encoderLastPos[6]));
 		
-		encoder6LastPos = encoder6Pos;
+		encoderLastPos[6] = encoderPos[6];
 	
-		previousEncoder6State = ENCODER6_A;
+		previousEncoderState[6] = ENCODER6_A;
 	}
 }
 

@@ -48,7 +48,6 @@
 #define		ENCODER5_B		P14
 #define		ENCODER6_A		P22				//	left-middle
 #define		ENCODER6_B		P21
-	
 
 /*	BASIC SWITCHES PIN NUMBER	*/
 #define		SW0						P17				//	left
