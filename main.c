@@ -24,7 +24,7 @@
 #define		STATUS_UPDATE		0x12			//	18_(10)
 #define		EVENT_HANDLER		0x13			//	19_(10)
 	
-#define		DEBOUNCE_TIME		10				//	10 ms
+#define		DEBOUNCE_COUNTER	10000
 
 
 typedef struct Node{
@@ -44,6 +44,7 @@ uint8_t getNodeNumber();
 void addNewNode(uint8_t devID, uint8_t val);
 
 void initI2C();
+void debounce(uint8_t number, bool state);
 	
 void checkSwitchStatus(void);
 void checkEncoderPosition(void);
@@ -55,8 +56,6 @@ uint8_t dataReceived = 0;
 uint8_t dummyDataReceived = 0;
 uint8_t statusReceived = 0;
 uint8_t eventReceived = 0;
-
-
 
 uint8_t rxDataCnt = 0;
 uint8_t txDataCnt = 0;
@@ -92,15 +91,21 @@ signed int encoder6LastPos = 0;
 
 signed int deltaEnc = 0;
 
+uint8_t sliderValue[3] = {0};
+uint8_t sliderLastValue[3] = {0};
+
+/*
 uint8_t slider0Value = 0;
 uint8_t slider0LastValue = 0;
 uint8_t slider1Value = 0;
 uint8_t slider1LastValue = 0;
 uint8_t slider2Value = 0;
 uint8_t slider2LastValue = 0;
+*/
+bool switchEvent[9] = {false};
+bool sliderEvent[3] = {false};
 
-bool switchEvent[9] = {false,false,false,false,false,false,false,false,false};
-bool sliderEvent[3] = {false,false,false};
+uint16_t btnCount[9] = {0};
 
 void I2C_ISR(void) interrupt 6
 {
@@ -226,20 +231,21 @@ void I2C_ISR(void) interrupt 6
 
 void main(void){
 	
+	
 	Set_All_GPIO_Quasi_Mode;
 
 	SW_INPUT_MODE_INIT();
 	ENCODER_SW_INPUT_MODE_INIT();
 	
 	initI2C();														// Initialize i2c communication
-/*
+
 	INIT_ADC_SLIDER0();
-	slider0LastValue = slider0Value = sliderRead();
+	sliderLastValue[0] = sliderValue[0] = sliderRead();
 	INIT_ADC_SLIDER1();
-	slider1LastValue = slider1Value = sliderRead();
+	sliderLastValue[1] = sliderValue[1] = sliderRead();
 	INIT_ADC_SLIDER2();
-	slider2LastValue = slider2Value = sliderRead();
-	*/
+	sliderLastValue[2] = sliderValue[2] = sliderRead();
+	
 	previousEncoder0State = ENCODER0_A;
 	previousEncoder1State = ENCODER1_A;
 	previousEncoder2State = ENCODER2_A;
@@ -252,7 +258,7 @@ void main(void){
 		
 		checkSwitchStatus();
 		checkEncoderPosition();
-		//checkSliderPosition();
+		checkSliderPosition();
 	}
 }
 
@@ -274,8 +280,8 @@ void initI2C(){
     
 		set_I2CEN;                              //	enable I2C
 		set_AA;																	//	for the first ACK
+	
 }
-
 
 int searchList(uint8_t searchID){
 
@@ -304,6 +310,7 @@ int searchList(uint8_t searchID){
 	
 	return 0;
 }
+
 
 uint8_t getNodeNumber(){
 
@@ -369,182 +376,256 @@ unsigned int sliderRead(){
 	return sliderValue/4;
 }
 
+void debounce(uint8_t number, bool state){
+
+	if(state){
+		btnCount[number]++;
+		
+		if(btnCount[number] == DEBOUNCE_COUNTER){
+			
+			switchEvent[number] = true;		
+			addNewNode(number, state);
+
+		}
+	}
+	else{
+		btnCount[number]--;
+		
+		if(btnCount[number] == 0){
+		
+			switchEvent[number] = false;
+			addNewNode(number, state);
+			
+		}
+	}
+
+
+}
 
 void checkSwitchStatus(){
 
-	if(SW0 == 0 && !switchEvent[0]){
+	if(!SW0 && !switchEvent[0]){
 		
-		addNewNode(0, 1);
+		debounce(0, 1);
+	}
+	else if(SW0 && switchEvent[0]){
 		
-		switchEvent[0] = true;
-
+		debounce(0, 0);
+	}
+	
+	
+	if(!SW1 && !switchEvent[1]){
+		btnCount[1]++;
+		
+		if(btnCount[1] == DEBOUNCE_COUNTER){
+		
+			addNewNode(1, 1);
+			switchEvent[1] = true;
+		
+		}
 	}
 	else{
-		if(switchEvent[0] && SW0){
+		if(SW1 && switchEvent[1]){
+			btnCount[1]--;
 			
-			addNewNode(0, 0);
+			if(btnCount[1] == 0){
 			
-			switchEvent[0] = false;
+				addNewNode(1, 0);
+				switchEvent[1] = false;
+			}
+			
 		}
-	}
-
-	
-	if(SW1 == 0 && !switchEvent[1]){
-		
-		addNewNode(1, 1);
-		
-		switchEvent[1] = true;
-		//switchStatus|=SET_BIT1;
-	}else{
-		if(switchEvent[1] && SW1 == 1){
-			
-			addNewNode(1, 0);
-			
-			switchEvent[1] = false;
-		}
-		//switchStatus&=~SET_BIT1;
 	}
 						
-	if(ENCODER_SW_0 == 0 && !switchEvent[2]){
+	if(!ENCODER_SW_0 && !switchEvent[2]){
+		btnCount[2]++;
 		
-		addNewNode(2, 1);
+		if(btnCount[2] == DEBOUNCE_COUNTER){
 		
-		switchEvent[2] = true;
-		//encoderSwitchStatus|=SET_BIT0;
-	}else{
-		if(switchEvent[2] && ENCODER_SW_0 == 1){
-			
-			addNewNode(2, 0);
-			
-			switchEvent[2] = false;
+			addNewNode(2, 1);
+			switchEvent[2] = true;
+		
 		}
-		//encoderSwitchStatus&=~SET_BIT0;
 	}
-	if(ENCODER_SW_1 == 0 && !switchEvent[3]){
-		
-		addNewNode(3, 1);
-		
-		switchEvent[3] = true;
-		//encoderSwitchStatus|=SET_BIT1;
-	}else{
-		if(switchEvent[3] && ENCODER_SW_1 == 1){
+	else{
+		if(ENCODER_SW_0 && switchEvent[2]){
+			btnCount[2]--;
 			
-			addNewNode(3, 0);
+			if(btnCount[2] == 0){
 			
-			switchEvent[3] = false;
+				addNewNode(2, 0);
+				switchEvent[2] = false;
+			}	
 		}
-		//encoderSwitchStatus&=~SET_BIT1;
 	}
-	if(ENCODER_SW_2 == 0 && !switchEvent[4]){
-		
-		addNewNode(4, 1);
-		
-		switchEvent[4] = true;
-		//encoderSwitchStatus|=SET_BIT2;
-	}else{
-		if(switchEvent[4] && ENCODER_SW_2 == 1){
-			
-			addNewNode(4, 0);
-			
-			switchEvent[4] = false;
-		}
-		//encoderSwitchStatus&=~SET_BIT2;
-	}
-	if(ENCODER_SW_3 == 0 && !switchEvent[5]){
-		
-		addNewNode(5, 1);
-		
-		switchEvent[5] = true;
-		//encoderSwitchStatus|=SET_BIT3;
-	}else{
-		if(switchEvent[5] && ENCODER_SW_3 == 1){
-			
-			addNewNode(5, 0);
-			
-			switchEvent[5] = false;
-		}
-		//encoderSwitchStatus&=~SET_BIT3;
-	}
-	if(ENCODER_SW_4 == 0 && !switchEvent[6]){
-		
-		addNewNode(6, 1);
-		
-		switchEvent[6] = true;
-		//encoderSwitchStatus|=SET_BIT4;
-	}else{
-		if(switchEvent[6] && ENCODER_SW_4 == 1){
-			
-			addNewNode(6, 0);
-			
-			switchEvent[6] = false;
-		}
-		//encoderSwitchStatus&=~SET_BIT4;
-	}
-	//if(((P4>>5 && 0x01) != 0x01)){							//	register P4 only byte addressable
 	
-	if(((P4>>5 & 0x01) != 0x01)  && !switchEvent[7]){							//	register P4 only byte addressable
+	if(!ENCODER_SW_1 && !switchEvent[3]){
+		btnCount[3]++;
 		
-		addNewNode(7, 1);
+		if(btnCount[3] == DEBOUNCE_COUNTER){
 		
-		switchEvent[7] = true;
-		//encoderSwitchStatus|=SET_BIT5;
-	}else{
-		if(switchEvent[7] && ((P4>>5 & 0x01) == 0x01)){
-			
-			addNewNode(7, 0);
-			
-			switchEvent[7] = false;
+			addNewNode(3, 1);
+			switchEvent[3] = true;
+		
 		}
-		//encoderSwitchStatus&=~SET_BIT5;
 	}
-	if(ENCODER_SW_6 == 0 && !switchEvent[8]){
-		
-		addNewNode(8, 1);
-		
-		switchEvent[8] = true;
-		//encoderSwitchStatus|=SET_BIT6;
-	}else{
-		if(switchEvent[8] && ENCODER_SW_6 == 1){
+	else{
+		if(ENCODER_SW_1 && switchEvent[3]){
+			btnCount[3]--;
 			
-			addNewNode(8, 0);
+			if(btnCount[3] == 0){
 			
-			switchEvent[8] = false;
+				addNewNode(3, 0);
+				switchEvent[3] = false;
+			}	
 		}
-		//encoderSwitchStatus&=~SET_BIT6;
+	}
+	
+	if(!ENCODER_SW_2 && !switchEvent[4]){
+		btnCount[4]++;
+		
+		if(btnCount[4] == DEBOUNCE_COUNTER){
+		
+			addNewNode(4, 1);
+			switchEvent[4] = true;
+		
+		}
+	}
+	else{
+		if(ENCODER_SW_2 && switchEvent[4]){
+			btnCount[4]--;
+			
+			if(btnCount[4] == 0){
+			
+				addNewNode(4, 0);
+				switchEvent[4] = false;
+			}
+		}
+	}
+	
+	if(!ENCODER_SW_3 && !switchEvent[5]){
+		btnCount[5]++;
+		
+		if(btnCount[5] == DEBOUNCE_COUNTER){
+		
+			addNewNode(5, 1);
+			switchEvent[5] = true;
+		
+		}
+	}
+	else{
+		if(ENCODER_SW_3 && switchEvent[5]){
+			btnCount[5]--;
+			
+			if(btnCount[5] == 0){
+			
+				addNewNode(5, 0);
+				switchEvent[5] = false;
+			}
+		}
+	}
+	
+	if(!ENCODER_SW_4 && !switchEvent[6]){
+		btnCount[6]++;
+		
+		if(btnCount[6] == DEBOUNCE_COUNTER){
+		
+			addNewNode(6, 1);
+			switchEvent[6] = true;
+		
+		}
+	}
+	else{
+		if(ENCODER_SW_4 && switchEvent[6]){
+			btnCount[6]--;
+			
+			if(btnCount[6] == 0){
+			
+				addNewNode(6, 0);
+				switchEvent[6] = false;
+			}
+		}
+	}
+		
+	if(((P4>>5 & 0x01) != 0x01)  && !switchEvent[7]){							//	register P4 only byte addressable
+		btnCount[7]++;
+		
+		if(btnCount[7] == DEBOUNCE_COUNTER){
+		
+			addNewNode(7, 1);
+			switchEvent[7] = true;
+		
+		}
+	}
+	else{
+		if(((P4>>5 & 0x01) == 0x01) && switchEvent[7]){
+			btnCount[7]--;
+			
+			if(btnCount[7] == 0){
+			
+				addNewNode(7, 0);
+				switchEvent[7] = false;
+			}
+		}
+	}
+	
+	if(!ENCODER_SW_6 && !switchEvent[8]){
+		btnCount[8]++;
+		
+		if(btnCount[8] == DEBOUNCE_COUNTER){
+		
+			addNewNode(8, 1);
+			switchEvent[8] = true;
+		
+		}
+	}
+	else{
+		if(ENCODER_SW_6 && switchEvent[8]){
+			btnCount[8]--;
+			
+			if(btnCount[8] == 0){
+			
+				addNewNode(8, 0);
+				switchEvent[8] = false;
+			}
+		}
 	}
 }
+
 
 void checkSliderPosition(){
 
 	INIT_ADC_SLIDER0();
-	slider0Value = sliderRead();
-	//if(slider0Value != slider0LastValue){
-	if(abs(slider0Value - slider0LastValue) > 4 ){
+	sliderValue[0] = sliderRead();
+	
+	if(abs(sliderValue[0] - sliderLastValue[0]) > 4 ){
 	
 		//searchList(0x20);
-		addNewNode(0x20, slider0Value);
+		addNewNode(0x20, sliderValue[0]);
 		
-		slider0LastValue = slider0Value;
+		sliderLastValue[0] = sliderValue[0];
 	}
 
 	INIT_ADC_SLIDER1();
-	slider1Value = sliderRead();
-	if(abs(slider1Value - slider1LastValue) > 4 ){
+	sliderValue[1] = sliderRead();
+	
+	if(abs(sliderValue[1] - sliderLastValue[1]) > 4 ){
 		
 		//searchList(0x21);
-		addNewNode(0x21, slider1Value);
+		addNewNode(0x21, sliderValue[1]);
 		
-		slider1LastValue = slider1Value;
+		sliderLastValue[1] = sliderValue[1];
 	}
 
 	INIT_ADC_SLIDER2();
-	slider2Value = sliderRead();
-	if(abs(slider2Value - slider2LastValue) > 4 ){
+	sliderValue[2] = sliderRead();
+	
+	if(abs(sliderValue[2] - sliderLastValue[2]) > 4 ){
 		
 		//searchList(0x22);
-		addNewNode(0x22, slider2Value);
+		addNewNode(0x22, sliderValue[2]);
 		
-		slider2LastValue = slider2Value;
+		sliderLastValue[2] = sliderValue[2];
 	}
 
 }
@@ -552,10 +633,6 @@ void checkSliderPosition(){
 
 void checkEncoderPosition(void){
 
-	/*	TODO -> SEARCH LIST FOR ENCODERS NEEDS TO ADD LAST VALUE TO THE NEW VALUE	*/
-	
-	//if(previousEncoder0State == 0 && ENCODER0_A == 1){
-	
 	if(previousEncoder0State != ENCODER0_A){
 		
 		if(ENCODER0_B != ENCODER0_A)
@@ -641,10 +718,7 @@ void checkEncoderPosition(void){
 		previousEncoder4State = ENCODER4_A;
 	}
 	
-	
-	
-	//if(previousEncoder5State == 0 && ((P4>>6 && 0x01) == 0x01)){
-	
+		
 	if(previousEncoder5State != ((P4>>6 && 0x01))){
 	
 		if(ENCODER5_B != ((P4>>6 && 0x01)))
