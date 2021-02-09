@@ -34,6 +34,7 @@
 
 
 /*	ENCODER A & B PINS	*/
+
 #define		ENCODER0_A		P07				//	center
 #define		ENCODER0_B		P33
 #define		ENCODER1_A		P31				//	left-up

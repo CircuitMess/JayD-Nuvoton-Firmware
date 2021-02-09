@@ -16,15 +16,12 @@
 	#define false 0
 #endif
 
-#define		I2C_ACK					0
-#define		I2C_NACK				1
+#define	SLAVE_ADDR	0x43	//	67_(10)
 
-#define		SLAVE_ADDR			0x43			//	67_(10)
-
-#define		STATUS_UPDATE		0x12			//	18_(10)
-#define		EVENT_HANDLER		0x13			//	19_(10)
+#define	STATUS_UPDATE	0x12	//	18_(10)
+#define	EVENT_HANDLER	0x13	//	19_(10)
 	
-#define		DEBOUNCE_COUNTER	10000
+#define	DEBOUNCE_COUNTER	1000
 
 
 typedef struct Node{
@@ -69,7 +66,7 @@ uint8_t expectedEventsInQueue = 0;
 uint8_t switchStatus = 0;
 uint8_t encoderSwitchStatus = 0;
 
-bool previousEncoderState[7] = {false};
+uint8_t previousEncoderState[7] = {0};
 signed int encoderPos[7] = {0};
 signed int encoderLastPos[7] = {0};
 
@@ -84,7 +81,6 @@ uint16_t btnCount[9] = {0};
 void I2C_ISR(void) interrupt 6
 {
 		struct Node *tempNode = NULL;
-	
 	
     switch (I2STAT)
     {
@@ -121,7 +117,6 @@ void I2C_ISR(void) interrupt 6
 								lastDataRx = true;
 								expectedEventsInQueue = dataReceived;
 						}					
-						
 								
 						if(lastDataRx){
 							AA = 0;
@@ -178,7 +173,6 @@ void I2C_ISR(void) interrupt 6
 									nodeNum--;
 								}
 							}
-							
 						}
 						
 						if(lastDataTx){
@@ -236,24 +230,23 @@ void main(void){
 	}
 }
 
-
 void initI2C(){
 
-		P23_OpenDrain_Mode;
-    P24_OpenDrain_Mode;
+	P23_OpenDrain_Mode;
+	P24_OpenDrain_Mode;
 	
-    P23 = 1;
-    P24 = 1;
+	P23 = 1;
+	P24 = 1;
     
-    //set_P0SR_6;                            //set SCL (P06) is  Schmitt triggered input select.
+	//set_P0SR_6;                            //set SCL (P06) is  Schmitt triggered input select.
  
-    set_EI2C;                               //	enable I2C interrupt
-    set_EA;																	//	enable interrupts - global
+	set_EI2C;                               //	enable I2C interrupt
+	set_EA;																	//	enable interrupts - global
 
-    I2ADDR = SLAVE_ADDR<<1;                 //define own slave address
+	I2ADDR = SLAVE_ADDR<<1;                 //define own slave address
     
-		set_I2CEN;                              //	enable I2C
-		set_AA;																	//	for the first ACK
+	set_I2CEN;                              //	enable I2C
+	set_AA;																	//	for the first ACK
 	
 }
 
@@ -346,7 +339,7 @@ unsigned int sliderRead(){
 	
 	sliderValue = ADCRH;
 	sliderValue <<= 2;
-	sliderValue |= ADCRL;
+	sliderValue |= (ADCRL & 0x03);
 	
 	return sliderValue/4;
 }
@@ -356,7 +349,7 @@ void debounce(uint8_t num, bool val){
 	if(val){
 		btnCount[num]++;
 		
-		if(btnCount[num] == DEBOUNCE_COUNTER){
+		if(btnCount[num] >= DEBOUNCE_COUNTER){
 			
 			switchEvent[num] = true;		
 			addNewNode(num, val);
@@ -366,15 +359,13 @@ void debounce(uint8_t num, bool val){
 	else{
 		btnCount[num]--;
 		
-		if(btnCount[num] == 0){
+		if(btnCount[num] <= 0){
 		
 			switchEvent[num] = false;
 			addNewNode(num, val);
 			
 		}
 	}
-
-
 }
 
 void checkSwitchStatus(){
@@ -390,6 +381,7 @@ void checkSwitchStatus(){
 	
 	
 	if(!SW1 && !switchEvent[1]){
+		
 		debounce(1, 1);
 		/*
 		btnCount[1]++;
@@ -404,6 +396,7 @@ void checkSwitchStatus(){
 	}
 	else{
 		if(SW1 && switchEvent[1]){
+			
 			debounce(1, 0);
 			/*
 			btnCount[1]--;
@@ -510,13 +503,14 @@ void sliders(){
 		
 		sliderValue[i] = sliderRead();
 	
-		if(abs(sliderValue[i] - sliderLastValue[i]) > 4 ){
+		if(abs(sliderValue[i] - sliderLastValue[i]) > 1 ){
 	
 			addNewNode((0x20 | i), sliderValue[i]);
 		
 			sliderLastValue[i] = sliderValue[i];
 		}
 		
+		ADCCON1&=CLR_BIT0;
 	}
 
 }
@@ -558,25 +552,7 @@ void checkSliderPosition(){
 
 }
 */
-/*
-void encoders(uint8_t num){
 
-	if(previousEncoderState[num] != encoderA[num]){
-		
-		if(encoderB[num] != encoderA[num])
-			encoderPos[num]++;
-		else
-			encoderPos[num]--;
-		
-		addNewNode((0x10 | num), (signed int)(encoderPos[num]-encoderLastPos[num]));
-	
-		encoderLastPos[num] = encoderPos[num];
-	
-		previousEncoderState[num] = encoderA[num];
-	}
-
-}
-*/
 void checkEncoderPosition(void){
 
 	if(previousEncoderState[0] != ENCODER0_A){
@@ -595,7 +571,6 @@ void checkEncoderPosition(void){
 	}
 	
 	
-	
 	if(previousEncoderState[1] != ENCODER1_A){
 	
 		if(ENCODER1_B != ENCODER1_A)
@@ -610,8 +585,6 @@ void checkEncoderPosition(void){
 	
 		previousEncoderState[1] = ENCODER1_A;
 	}
-	
-
 	
 	
 	if(previousEncoderState[2] != ENCODER2_A){
@@ -629,7 +602,6 @@ void checkEncoderPosition(void){
 		previousEncoderState[2] = ENCODER2_A;
 	}
 	
-
 	
 	if(previousEncoderState[3] != ENCODER3_A){
 	
@@ -645,8 +617,6 @@ void checkEncoderPosition(void){
 	
 		previousEncoderState[3] = ENCODER3_A;
 	}
-	
-
 	
 	
 	if(previousEncoderState[4] != ENCODER4_A){
@@ -677,8 +647,8 @@ void checkEncoderPosition(void){
 		
 		encoderLastPos[5] = encoderPos[5];
 	
-		//previousEncoderState[5] = (P4>>6 && 0x01);
-		previousEncoderState[5] = ENCODER5_A;
+		previousEncoderState[5] = (P4>>6 && 0x01);
+		//previousEncoderState[5] = ENCODER5_A;
 	}
 	
 	
