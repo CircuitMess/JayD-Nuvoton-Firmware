@@ -7,17 +7,17 @@
 #include "sliders.h"
 #include "list.h"
 
-uint8_t sliderValue[3] = {0};
+uint8_t sliderValueEMA[3] = {0};
 uint8_t sliderLastValue[3] = {0};
 
 void slidersInit(){
 
 	INIT_ADC_SLIDER0();
-	sliderLastValue[0] = sliderValue[0] = sliderRead();
+	sliderLastValue[0] = sliderValueEMA[0] = sliderRead();
 	INIT_ADC_SLIDER1();
-	sliderLastValue[1] = sliderValue[1] = sliderRead();
+	sliderLastValue[1] = sliderValueEMA[1] = sliderRead();
 	INIT_ADC_SLIDER2();
-	sliderLastValue[2] = sliderValue[2] = sliderRead();
+	sliderLastValue[2] = sliderValueEMA[2] = sliderRead();
 }
 
 unsigned int sliderRead(){
@@ -38,7 +38,7 @@ unsigned int sliderRead(){
 
 void slidersScan(){
 	
-	uint8_t i;
+	uint8_t sliderValue,i;
 	
 	for(i = 0; i < 3; i++){
 	
@@ -49,13 +49,15 @@ void slidersScan(){
 		if(i == 2)
 			INIT_ADC_SLIDER2();
 		
-		sliderValue[i] = sliderRead();
+		sliderValue = sliderRead();
+		//sliderValueEMA[i]= sliderRead();
+		sliderValueEMA[i] = (EMA_ALPHA*sliderValue) + ((1-EMA_ALPHA)*sliderValueEMA[i]);
 	
-		if(abs(sliderValue[i] - sliderLastValue[i]) > 1 ){
+		if(sliderValueEMA[i] != sliderLastValue[i]){
 	
-			addNewNode((0x20 | i), sliderValue[i]);
+			addNewNode((0x20 | i), sliderValueEMA[i]);
 		
-			sliderLastValue[i] = sliderValue[i];
+			sliderLastValue[i] = sliderValueEMA[i];
 		}
 		
 		ADCCON1&=CLR_BIT0;
