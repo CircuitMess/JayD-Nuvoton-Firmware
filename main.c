@@ -17,6 +17,8 @@ uint8_t dataReceived = 0;
 uint8_t dummyDataReceived = 0;
 uint8_t statusReceived = 0;
 uint8_t eventReceived = 0;
+bool idVerificationStatus = false;
+
 
 struct Node *eventNode = NULL;
 	
@@ -59,6 +61,19 @@ void I2C_ISR(void) interrupt 6
 								
 							eventReceived = dataReceived;
 							lastDataRx = false;
+						}
+						else if(dataReceived == ID_VERIFICATION){
+							
+							idVerificationStatus = true;
+							lastDataRx = true;
+						}
+						else if(dataReceived == RESET_COMMAND){
+						
+							TA = 0x0AA;
+							TA = 0x55;
+							CHPCON |= 0x80;
+							
+							lastDataRx = true;
 						}
 						
 						if (eventReceived == EVENT_HANDLER){
@@ -123,6 +138,12 @@ void I2C_ISR(void) interrupt 6
 								}
 							}
 						}
+						else if(idVerificationStatus){
+						
+							I2DAT = SLAVE_ADDR;
+							idVerificationStatus = false;
+							lastDataTx = true;
+						}
 						
 						if(lastDataTx){
 							AA = 0;
@@ -157,7 +178,7 @@ void main(void){
 
 	slidersInit();
 	encodersInit();
-	
+
 	while(1){
 		
 		buttonsScan();
