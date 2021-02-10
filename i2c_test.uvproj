@@ -387,9 +387,24 @@
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>Input.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Input.h</FilePath>
+              <FileName>buttonHandler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\buttonHandler.c</FilePath>
+            </File>
+            <File>
+              <FileName>sliderHandler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\sliderHandler.c</FilePath>
+            </File>
+            <File>
+              <FileName>encoderHandler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\encoderHandler.c</FilePath>
+            </File>
+            <File>
+              <FileName>listHandler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\listHandler.c</FilePath>
             </File>
           </Files>
         </Group>
