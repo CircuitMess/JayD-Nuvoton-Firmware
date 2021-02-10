@@ -6,130 +6,107 @@
 #include "list.h"
 
 bool switchEvent[9] = {false};
-uint16_t btnCount[9] = {0};
-
-void btnDebounce(uint8_t num, bool val){
-
-	if(val){
-		btnCount[num]++;
-		
-		if(btnCount[num] >= DEBOUNCE_COUNTER){
-			
-			switchEvent[num] = true;		
-			addNewNode(num, val);
-
-		}
-	}
-	else{
-		btnCount[num]--;
-		
-		if(btnCount[num] <= 0){
-		
-			switchEvent[num] = false;
-			addNewNode(num, val);
-			
-		}
-	}
-}
-
 
 void buttonsScan(){
 
 	if(!SW0 && !switchEvent[0]){
 		
-		btnDebounce(0, 1);
+		switchEvent[0] = true;		
+		addNewNode(0, 1);
 	}
 	else if(SW0 && switchEvent[0]){
 		
-		btnDebounce(0, 0);
+		switchEvent[0] = false;		
+		addNewNode(0, 0);
 	}
 	
 	if(!SW1 && !switchEvent[1]){
 		
-		btnDebounce(1, 1);
+		switchEvent[1] = true;		
+		addNewNode(1, 1);
 		
 	}
-	else{
-		if(SW1 && switchEvent[1]){
+	else if(SW1 && switchEvent[1]){
 			
-			btnDebounce(1, 0);
-		}	
-	}
+		switchEvent[1] = false;		
+		addNewNode(1, 0);
+	}		
 						
 	if(!ENCODER_SW_0 && !switchEvent[2]){
 		
-		btnDebounce(2, 1);
+		switchEvent[2] = true;		
+		addNewNode(2, 1);
 	}
-	else{
-		if(ENCODER_SW_0 && switchEvent[2]){
+	else if(ENCODER_SW_0 && switchEvent[2]){
 			
-			btnDebounce(2, 0);
-		}
+		switchEvent[2] = false;		
+		addNewNode(2, 0);
 	}
+	
 	
 	if(!ENCODER_SW_1 && !switchEvent[3]){
 		
-		btnDebounce(3, 1);
+		switchEvent[3] = true;		
+		addNewNode(3, 1);
 	}
-	else{
-		if(ENCODER_SW_1 && switchEvent[3]){
+	else if(ENCODER_SW_1 && switchEvent[3]){
 			
-			btnDebounce(3, 0);			
-		}
+		switchEvent[3] = false;		
+		addNewNode(3, 0);		
 	}
 	
 	if(!ENCODER_SW_2 && !switchEvent[4]){
 		
-		btnDebounce(4, 1);
+		switchEvent[4] = true;		
+		addNewNode(4, 1);
 	}
-	else{
-		if(ENCODER_SW_2 && switchEvent[4]){
+	else if(ENCODER_SW_2 && switchEvent[4]){
 			
-			btnDebounce(4, 0);
-		}
+		switchEvent[4] = false;		
+		addNewNode(4, 0);		
 	}
 	
 	if(!ENCODER_SW_3 && !switchEvent[5]){
 		
-		btnDebounce(5, 1);
+		switchEvent[5] = true;		
+		addNewNode(5, 1);
 	}
-	else{
-		if(ENCODER_SW_3 && switchEvent[5]){
+	else if(ENCODER_SW_3 && switchEvent[5]){
 			
-			btnDebounce(5, 0);
-		}
+		switchEvent[5] = false;		
+		addNewNode(5, 0);		
 	}
 	
 	if(!ENCODER_SW_4 && !switchEvent[6]){
 		
-		btnDebounce(6, 1);
+		switchEvent[6] = true;		
+		addNewNode(6, 1);
 	}
-	else{
-		if(ENCODER_SW_4 && switchEvent[6]){
+	else if(ENCODER_SW_4 && switchEvent[6]){
 			
-			btnDebounce(6, 0);
-		}
+		switchEvent[6] = false;		
+		addNewNode(6, 0);	
 	}
 		
 	if(((P4>>5 & 0x01) != 0x01)  && !switchEvent[7]){							//	register P4 only byte addressable
 		
-		btnDebounce(7, 1);
+		switchEvent[7] = true;		
+		addNewNode(7, 1);
 	}
-	else{
-		if(((P4>>5 & 0x01) == 0x01) && switchEvent[7]){
+	else if(((P4>>5 & 0x01) == 0x01) && switchEvent[7]){
 			
-			btnDebounce(7, 0);
-		}
+		switchEvent[7] = false;		
+		addNewNode(7, 0);	
 	}
 	
 	if(!ENCODER_SW_6 && !switchEvent[8]){
 		
-		btnDebounce(8, 1);
+		switchEvent[8] = true;		
+		addNewNode(8, 1);
 	}
-	else{
-		if(ENCODER_SW_6 && switchEvent[8]){
+	else if(ENCODER_SW_6 && switchEvent[8]){
 			
-			btnDebounce(8, 0);
-		}
+		switchEvent[8] = false;		
+		addNewNode(8, 0);	
 	}
 }
