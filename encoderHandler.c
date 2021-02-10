@@ -10,6 +10,8 @@ signed int encoderPos[7] = {0};
 signed int encoderLastPos[7] = {0};
 
 void encodersInit(){
+	
+	ENC_SCHMITT_TRIGGER_INPUT;
 
 	previousEncoderState[0] = ENCODER0_A;
 	previousEncoderState[1] = ENCODER1_A;
@@ -85,7 +87,7 @@ void encodersScan(void){
 	
 		previousEncoderState[3] = ENCODER3_A;
 	}
-	
+	/*
 	
 	if(previousEncoderState[4] != ENCODER4_A){
 	
@@ -133,5 +135,5 @@ void encodersScan(void){
 		encoderLastPos[6] = encoderPos[6];
 	
 		previousEncoderState[6] = ENCODER6_A;
-	}
+	}*/
 }

@@ -1,5 +1,5 @@
 /*	ENCODERS GPIO MODE	*/
-#define		P07_Quasi_Mode				P0M1&=~SET_BIT7;P0M2&=~SET_BIT7
+#define		P15_Quasi_Mode				P1M1&=~SET_BIT5;P1M2&=~SET_BIT5
 #define		P33_Quasi_Mode				P3M1&=~SET_BIT3;P3M2&=~SET_BIT3
 #define		P31_Quasi_Mode				P3M1&=~SET_BIT1;P3M2&=~SET_BIT1
 #define		P30_Quasi_Mode				P3M1&=~SET_BIT0;P3M2&=~SET_BIT0
@@ -17,7 +17,7 @@
 
 /*	ENCODER A & B PINS	*/
 
-#define		ENCODER0_A		P07				//	center
+#define		ENCODER0_A		P15				//	center
 #define		ENCODER0_B		P33
 #define		ENCODER1_A		P31				//	left-up
 #define		ENCODER1_B		P30
@@ -32,6 +32,7 @@
 #define		ENCODER6_A		P22				//	left-middle
 #define		ENCODER6_B		P21
 
+#define	ENC_SCHMITT_TRIGGER_INPUT		P1S&=0xFF;P1S|=0x30; P2S&=0xFF;P2S|=0x06; P3S&=0xFF;P3S|=0x0B; P4S&=0xFF;P4S|=0x40; P5S&=0xFF;P5S|=0x6D;
 
 void encodersInit();
 void encodersScan(void);
