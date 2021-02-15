@@ -28,7 +28,7 @@ uint8_t expectedEventsInQueue = 0;
 
 void I2C_ISR(void) interrupt 6
 {
-	struct Node *eventNode = NULL;
+	//struct Node *eventNode = NULL;
 	
     switch (I2STAT)
     {
@@ -106,13 +106,14 @@ void I2C_ISR(void) interrupt 6
 					
 						if(statusReceived == STATUS_UPDATE){
 							
-							I2DAT = nodeNum;	
+							sendNodeNum();
+							//I2DAT = nodeNum;	
 							lastDataTx = true;
 							statusReceived = 0;
 						}
 						else if(eventReceived == EVENT_HANDLER){
 						
-							eventNode = rootNode;
+							//eventNode = rootNode;
 							
 							if(txDataCnt >= expectedEventsInQueue*2){
 								lastDataTx = true;
@@ -122,11 +123,16 @@ void I2C_ISR(void) interrupt 6
 							else{
 								lastDataTx = false;
 								
-								if(++txDataCnt % 2 == 1)
-									I2DAT = eventNode->deviceID;
+								if(++txDataCnt % 2 == 1){
+									sendDevID();
+									//I2DAT = eventNode->deviceID;
+								}
 								else{ 
-									I2DAT = eventNode->value;
+									sendDevValue();
+									//I2DAT = eventNode->value;
 							
+									freeElement();
+									/*
 									if(rootNode == lastNode){
 										lastNode = NULL;
 									}
@@ -144,7 +150,7 @@ void I2C_ISR(void) interrupt 6
 									
 									free(eventNode);
 									
-									nodeNum--;
+									nodeNum--;*/
 								}
 							}
 						}
@@ -158,7 +164,6 @@ void I2C_ISR(void) interrupt 6
 						if(lastDataTx){
 							AA = 0;
 							lastDataTx = false;
-							free(eventNode);
 						}
 						else
 							AA = 1;
