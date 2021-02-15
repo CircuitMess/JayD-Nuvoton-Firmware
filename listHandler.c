@@ -10,7 +10,6 @@ uint8_t nodeNum = 0;
 struct Node *sliderNode[3] = {NULL};
 struct Node *lastNode = NULL;
 
-
 void addNewNode(uint8_t devID, uint8_t val){
 		
 		clr_EA;
@@ -67,29 +66,45 @@ void addNewNode(uint8_t devID, uint8_t val){
 	set_EA;
 }
 
-	struct Node *temp = rootNode;
-	struct Node *prev = rootNode;
+void sendNodeNum(){
 	
-	if(!rootNode)
-		return 0;
+	I2DAT = nodeNum;
+}
+
+void sendDevID(){
 	
-	while(temp){
+	I2DAT = rootNode->deviceID;
+}
+
+void sendDevValue(){
 	
-		if(temp->deviceID == searchID){
-		
-			if(temp == rootNode)
-				rootNode = temp->nextNode;
-			else
-				prev->nextNode = temp->nextNode;
-			
-			return 1;
-		}
-		
-		prev = temp;
-		temp = temp->nextNode;
-		
+	I2DAT = rootNode->value;
+}
+
+void freeElement(){
+
+	struct Node *eventNode = NULL;
+	
+	if(rootNode == lastNode){
+		lastNode = NULL;
 	}
 	
-	return 0;
+	
+	if(rootNode == sliderNode[0]){
+		sliderNode[0] = NULL;
+	}
+	else if(rootNode == sliderNode[1]){
+		sliderNode[1] = NULL;
+	}
+	else if(rootNode == sliderNode[2]){
+		sliderNode[2] = NULL;
+	}
+
+	
+	eventNode = rootNode->nextNode;		
+	free(rootNode);
+	rootNode = eventNode;
+	
+	nodeNum--;
 }
-*/
+
