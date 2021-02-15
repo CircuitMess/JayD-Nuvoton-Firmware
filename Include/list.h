@@ -8,11 +8,11 @@ typedef struct Node{
 	
 };
 
-uint8_t getNodeNumber();	
+//uint8_t getNodeNumber();	
 void addNewNode(uint8_t devID, uint8_t val);
+//int searchList(uint8_t searchID);
 
-extern struct Node *rootNode;
-extern uint8_t nodeNum;
-extern struct Node *sliderNode[3];
-extern struct Node *lastNode;
-
+void sendNodeNum();
+void sendDevID();
+void sendDevValue();
+void freeElement();
