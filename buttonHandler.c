@@ -7,8 +7,14 @@
 
 bool switchEvent[9] = {false};
 
-void buttonsScan(){
+void buttonsInit(){
 
+	SW_INPUT_MODE_INIT();
+	ENCODER_SW_INPUT_MODE_INIT();
+}
+
+void buttonsScan(){
+/*
 	if(!SW0 && !switchEvent[0]){
 		
 		switchEvent[0] = true;		
@@ -31,7 +37,7 @@ void buttonsScan(){
 		switchEvent[1] = false;		
 		addNewNode(1, 0);
 	}		
-						
+	*/
 	if(!ENCODER_SW_0 && !switchEvent[2]){
 		
 		switchEvent[2] = true;		
@@ -54,7 +60,7 @@ void buttonsScan(){
 		switchEvent[3] = false;		
 		addNewNode(3, 0);		
 	}
-	
+	/*
 	if(!ENCODER_SW_2 && !switchEvent[4]){
 		
 		switchEvent[4] = true;		
@@ -108,5 +114,5 @@ void buttonsScan(){
 			
 		switchEvent[8] = false;		
 		addNewNode(8, 0);	
-	}
+	}*/
 }

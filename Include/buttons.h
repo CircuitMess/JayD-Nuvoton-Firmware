@@ -29,6 +29,9 @@
 #define		ENCODER_SW_4	P26				//	right-up
 #define		ENCODER_SW_5	P4^5			//	left-down
 #define		ENCODER_SW_6	P20				//	left-middle
+
+
 #define		ENCODER_SW_INPUT_MODE_INIT()	do{P32_Input_Mode; P57_Input_Mode; P54_Input_Mode; P51_Input_Mode; P26_Input_Mode; /*P45_Input_Mode;*/ P20_Input_Mode; ENC_SW_SCHMITT_TRIGGER_INPUT;}while(0)
 
+void buttonsInit();
 void buttonsScan(void);
