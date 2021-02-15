@@ -28,160 +28,140 @@ uint8_t expectedEventsInQueue = 0;
 
 void I2C_ISR(void) interrupt 6
 {
-	//struct Node *eventNode = NULL;
-	
-    switch (I2STAT)
-    {
-        case 0x00:											//	bus error
-            STO = 1;
-						
-            break;
+	switch (I2STAT)
+	{
+		case 0x00:		//	bus error
+			STO = 1;			
+			break;
 
-        case 0x60:											//	slave receive address ACK
-            AA = 1;
-            break;
+		case 0x60:		//	slave receive address ACK
+			AA = 1;
+			break;
 				
-        case 0x68:											//	slave receive arbitration lost
-						AA = 0;
-						STA = 1;
-            break;
+		case 0x68:		//	slave receive arbitration lost
+			AA = 0;
+			STA = 1;
+			break;
 
-        case 0x80:											//	slave receive data ACK
-            dataReceived = I2DAT;
+		case 0x80:		//	slave receive data ACK
+			dataReceived = I2DAT;
 						
-						if(dataReceived == STATUS_UPDATE){
+			if(dataReceived == STATUS_UPDATE){
 
-							statusReceived = dataReceived;
-							lastDataRx = true;
-						}
-						else if(dataReceived == EVENT_HANDLER){
+				statusReceived = dataReceived;
+				lastDataRx = true;
+			}
+			else if(dataReceived == EVENT_HANDLER){
 								
-							eventReceived = dataReceived;
-							lastDataRx = false;
-						}
-						else if(dataReceived == ID_VERIFICATION){
+				eventReceived = dataReceived;
+				lastDataRx = false;
+			}
+			else if(dataReceived == ID_VERIFICATION){
 							
-							idVerificationStatus = true;
-							lastDataRx = true;
-						}
-						else if(dataReceived == RESET_COMMAND){
+				idVerificationStatus = true;
+				lastDataRx = true;
+			}
+			else if(dataReceived == RESET_COMMAND){
 						
-							TA = 0x0AA;
-							TA = 0x55;
-							CHPCON |= 0x80;
+				TA = 0x0AA;
+				TA = 0x55;
+				CHPCON |= 0x80;
 							
-							lastDataRx = true;
-						}
+				lastDataRx = true;
+			}
 						
-						if (eventReceived == EVENT_HANDLER){
+			if (eventReceived == EVENT_HANDLER){
 								
-								lastDataRx = true;
-								expectedEventsInQueue = dataReceived;
-						}					
+				lastDataRx = true;
+				expectedEventsInQueue = dataReceived;
+			}					
 								
-						if(lastDataRx){
-							AA = 0;
-							lastDataRx = false;
-						}
-						else
-							AA = 1;
-						
-            break;
+			if(lastDataRx){
+				AA = 0;
+				lastDataRx = false;
+			}
+			else{
+				AA = 1;
+			}
 
-        case 0x88:											//	slave receive data NACK
-            dummyDataReceived = I2DAT;
-            AA = 1;
-            break;
+			break;
 
-        case 0xA0:											//	slave transmit repeat start or stop
-            AA = 1;
-            break;
+			case 0x88:		//	slave receive data NACK
+				dummyDataReceived = I2DAT;
+				AA = 1;
+				break;
 
-        case 0xA8:											//	slave transmit address ACK
-            I2DAT = SLAVE_ADDR;
-            AA = 1;
-            break;
+			case 0xA0:		//	slave transmit repeat start or stop
+				AA = 1;
+				break;
+
+			case 0xA8:		//	slave transmit address ACK
+				I2DAT = SLAVE_ADDR;
+				AA = 1;
+				break;
         
-        case 0xB8:											//	slave transmit data ACK
+			case 0xB8:		//	slave transmit data ACK
 					
-						if(statusReceived == STATUS_UPDATE){
+				if(statusReceived == STATUS_UPDATE){
 							
-							sendNodeNum();
-							//I2DAT = nodeNum;	
-							lastDataTx = true;
-							statusReceived = 0;
-						}
-						else if(eventReceived == EVENT_HANDLER){
-						
-							//eventNode = rootNode;
-							
-							if(txDataCnt >= expectedEventsInQueue*2){
-								lastDataTx = true;
-								txDataCnt = 0;
-								eventReceived = 0;
-							}
-							else{
-								lastDataTx = false;
+					sendNodeNum();
+					
+					lastDataTx = true;
+					statusReceived = 0;
+				}
+				else if(eventReceived == EVENT_HANDLER){
 								
-								if(++txDataCnt % 2 == 1){
-									sendDevID();
-									//I2DAT = eventNode->deviceID;
-								}
-								else{ 
-									sendDevValue();
-									//I2DAT = eventNode->value;
+					if(txDataCnt >= expectedEventsInQueue*2){
+						
+						lastDataTx = true;
+						txDataCnt = 0;
+						eventReceived = 0;
+					}
+					else{
+						
+						lastDataTx = false;
+								
+						if(++txDataCnt % 2 == 1){
+
+							sendDevID();
+						}
+						else{ 
+							sendDevValue();
 							
-									freeElement();
-									/*
-									if(rootNode == lastNode){
-										lastNode = NULL;
-									}
-									rootNode = eventNode->nextNode;
-									
-									if(eventNode == sliderNode[0]){
-										sliderNode[0] = NULL;
-									}
-									else if(eventNode == sliderNode[1]){
-										sliderNode[1] = NULL;
-									}
-									else if(eventNode == sliderNode[2]){
-										sliderNode[2] = NULL;
-									}
-									
-									free(eventNode);
-									
-									nodeNum--;*/
-								}
-							}
+							freeElement();
 						}
-						else if(idVerificationStatus){
+					}
+				}
+				else if(idVerificationStatus){
 						
-							I2DAT = SLAVE_ADDR;
-							idVerificationStatus = false;
-							lastDataTx = true;
-						}
+					I2DAT = SLAVE_ADDR;
+					idVerificationStatus = false;
+					lastDataTx = true;
+				}
 						
-						if(lastDataTx){
-							AA = 0;
-							lastDataTx = false;
-						}
-						else
-							AA = 1;
-						
-            break;
+				if(lastDataTx){
+					AA = 0;
+					lastDataTx = false;
+				}
+				else{
+					AA = 1;
+				}
+				
+				break;
 
-        case 0xC0:											//	slave transmit data NACK
-						AA = 1;
-            break; 
+			case 0xC0:		//	slave transmit data NACK
+				AA = 1;
+				break; 
 
-        case 0xC8:											//	slave transmit last data ACK
-            AA = 1;
-            break;        
-    }
+			case 0xC8:		//	slave transmit last data ACK
+				AA = 1;
+				break;        
+	}
 
-    SI = 0;
-		while(STO);
+	SI = 0;
+	while(STO);
 }
+
 
 void main(void){
 	
@@ -197,7 +177,7 @@ void main(void){
 	for(i = 0; i<100000; i++){}
 	P25 = 1;
 	
-	initI2C();														// Initialize i2c communication
+	initI2C();		// Initialize i2c communication
 
 	buttonsInit();
 	slidersInit();
@@ -210,6 +190,7 @@ void main(void){
 		slidersScan();
 	}
 }
+
 
 void initI2C(){
 
@@ -226,5 +207,4 @@ void initI2C(){
     
 	set_I2CEN;
 	set_AA;
-	
 }
