@@ -12,6 +12,10 @@ uint8_t sliderLastValue[3] = {0};
 
 void slidersInit(){
 
+	ADC_DISABLE;
+	ADC_CLK_DIV;
+	ADC_ACQ;
+	
 	INIT_ADC_SLIDER0();
 	sliderLastValue[0] = sliderValueEMA[0] = sliderRead();
 	INIT_ADC_SLIDER1();
@@ -41,16 +45,21 @@ void slidersScan(){
 	uint8_t sliderValue,i;
 	
 	for(i = 0; i < 3; i++){
-	
-		if(i == 0)
-			INIT_ADC_SLIDER0();
-		if(i == 1)
-			INIT_ADC_SLIDER1();
-		if(i == 2)
-			INIT_ADC_SLIDER2();
 		
+		if(i == 0){
+			INIT_ADC_SLIDER0();
+		}
+		else if(i == 1){
+			INIT_ADC_SLIDER1();
+		}
+		else if(i == 2){
+			INIT_ADC_SLIDER2();
+		}
+		
+		set_IDLE;
+		while(!ADCF){}
 		sliderValue = sliderRead();
-		//sliderValueEMA[i]= sliderRead();
+
 		sliderValueEMA[i] = (EMA_ALPHA*sliderValue) + ((1-EMA_ALPHA)*sliderValueEMA[i]);
 	
 		if(sliderValueEMA[i] != sliderLastValue[i]){
@@ -64,41 +73,3 @@ void slidersScan(){
 	}
 
 }
-/*	Old Slider Function
-void checkSliderPosition(){
-
-	INIT_ADC_SLIDER0();
-	sliderValue[0] = sliderRead();
-	
-	if(abs(sliderValue[0] - sliderLastValue[0]) > 4 ){
-	
-		//searchList(0x20);
-		addNewNode(0x20, sliderValue[0]);
-		
-		sliderLastValue[0] = sliderValue[0];
-	}
-
-	INIT_ADC_SLIDER1();
-	sliderValue[1] = sliderRead();
-	
-	if(abs(sliderValue[1] - sliderLastValue[1]) > 4 ){
-		
-		//searchList(0x21);
-		addNewNode(0x21, sliderValue[1]);
-		
-		sliderLastValue[1] = sliderValue[1];
-	}
-
-	INIT_ADC_SLIDER2();
-	sliderValue[2] = sliderRead();
-	
-	if(abs(sliderValue[2] - sliderLastValue[2]) > 4 ){
-		
-		//searchList(0x22);
-		addNewNode(0x22, sliderValue[2]);
-		
-		sliderLastValue[2] = sliderValue[2];
-	}
-
-}
-*/
