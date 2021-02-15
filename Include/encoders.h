@@ -3,6 +3,8 @@
 #define		P33_Quasi_Mode				P3M1&=~SET_BIT3;P3M2&=~SET_BIT3
 #define		P31_Quasi_Mode				P3M1&=~SET_BIT1;P3M2&=~SET_BIT1
 #define		P30_Quasi_Mode				P3M1&=~SET_BIT0;P3M2&=~SET_BIT0
+//#define		P31_Input_Mode				P3M1|=SET_BIT1;P3M2&=~SET_BIT1
+//#define		P30_Input_Mode				P3M1|=SET_BIT0;P3M2&=~SET_BIT0
 #define		P56_Quasi_Mode				P5M1&=~SET_BIT6;P5M2&=~SET_BIT6
 #define		P55_Quasi_Mode				P5M1&=~SET_BIT5;P5M2&=~SET_BIT5
 #define		P53_Quasi_Mode				P5M1&=~SET_BIT3;P5M2&=~SET_BIT3
@@ -11,7 +13,7 @@
 #define		P27_Quasi_Mode				P2M1&=~SET_BIT7;P2M2&=~SET_BIT7
 #define		P46_Quasi_Mode				P4M1&=~SET_BIT6;P4M2&=~SET_BIT6
 #define		P14_Quasi_Mode				P1M1&=~SET_BIT4;P1M2&=~SET_BIT4
-#define		p22_Quasi_Mode				P2M1&=~SET_BIT2;P2M2&=~SET_BIT2
+#define		P22_Quasi_Mode				P2M1&=~SET_BIT2;P2M2&=~SET_BIT2
 #define		P21_Quasi_Mode				P2M1&=~SET_BIT1;P2M2&=~SET_BIT1
 
 
@@ -33,6 +35,9 @@
 #define		ENCODER6_B		P21
 
 #define	ENC_SCHMITT_TRIGGER_INPUT		P1S&=0xFF;P1S|=0x30; P2S&=0xFF;P2S|=0x06; P3S&=0xFF;P3S|=0x0B; P4S&=0xFF;P4S|=0x40; P5S&=0xFF;P5S|=0x6D;
+
+#define ENC_A_B_INIT()		do{P15_Quasi_Mode; P33_Quasi_Mode; P31_Quasi_Mode; P30_Quasi_Mode; P56_Quasi_Mode; P55_Quasi_Mode; P53_Quasi_Mode; P52_Quasi_Mode; P50_Quasi_Mode; P27_Quasi_Mode; P46_Quasi_Mode; P14_Quasi_Mode; P22_Quasi_Mode; P21_Quasi_Mode; ENC_SCHMITT_TRIGGER_INPUT;}while(0)
+
 
 void encodersInit();
 void encodersScan(void);
