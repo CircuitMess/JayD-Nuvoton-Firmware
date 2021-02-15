@@ -16,6 +16,8 @@ void slidersInit(){
 	ADC_CLK_DIV;
 	ADC_ACQ;
 	
+	INIT_ADC_SLIDERS();
+	
 	INIT_ADC_SLIDER0();
 	sliderLastValue[0] = sliderValueEMA[0] = sliderRead();
 	INIT_ADC_SLIDER1();
@@ -37,7 +39,7 @@ unsigned int sliderRead(){
 	sliderValue <<= 2;
 	sliderValue |= (ADCRL & 0x03);
 	
-	return sliderValue/4;
+	return (unsigned int)sliderValue/4;
 }
 
 void slidersScan(){
@@ -57,9 +59,9 @@ void slidersScan(){
 		}
 		
 		set_IDLE;
-		while(!ADCF){}
+		
 		sliderValue = sliderRead();
-
+		
 		sliderValueEMA[i] = (EMA_ALPHA*sliderValue) + ((1-EMA_ALPHA)*sliderValueEMA[i]);
 	
 		if(sliderValueEMA[i] != sliderLastValue[i]){
@@ -73,3 +75,4 @@ void slidersScan(){
 	}
 
 }
+ 
