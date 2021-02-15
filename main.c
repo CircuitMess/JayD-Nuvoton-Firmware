@@ -18,9 +18,6 @@ uint8_t dummyDataReceived = 0;
 uint8_t statusReceived = 0;
 uint8_t eventReceived = 0;
 bool idVerificationStatus = false;
-
-
-struct Node *eventNode = NULL;
 	
 uint8_t rxDataCnt = 0;
 uint8_t txDataCnt = 0;
@@ -31,7 +28,7 @@ uint8_t expectedEventsInQueue = 0;
 
 void I2C_ISR(void) interrupt 6
 {
-		struct Node *tempNode = NULL;
+	struct Node *eventNode = NULL;
 	
     switch (I2STAT)
     {
@@ -120,7 +117,6 @@ void I2C_ISR(void) interrupt 6
 							if(txDataCnt >= expectedEventsInQueue*2){
 								lastDataTx = true;
 								txDataCnt = 0;
-								rootNode = eventNode;
 								eventReceived = 0;
 							}
 							else{
@@ -131,9 +127,23 @@ void I2C_ISR(void) interrupt 6
 								else{ 
 									I2DAT = eventNode->value;
 							
-									tempNode = eventNode;
-									eventNode = eventNode->nextNode;
-									free(tempNode);
+									if(rootNode == lastNode){
+										lastNode = NULL;
+									}
+									rootNode = eventNode->nextNode;
+									
+									if(eventNode == sliderNode[0]){
+										sliderNode[0] = NULL;
+									}
+									else if(eventNode == sliderNode[1]){
+										sliderNode[1] = NULL;
+									}
+									else if(eventNode == sliderNode[2]){
+										sliderNode[2] = NULL;
+									}
+									
+									free(eventNode);
+									
 									nodeNum--;
 								}
 							}
@@ -148,6 +158,7 @@ void I2C_ISR(void) interrupt 6
 						if(lastDataTx){
 							AA = 0;
 							lastDataTx = false;
+							free(eventNode);
 						}
 						else
 							AA = 1;
@@ -169,13 +180,21 @@ void I2C_ISR(void) interrupt 6
 
 void main(void){
 	
+	uint32_t i = 0;
+	
 	Set_All_GPIO_Quasi_Mode;
-
-	SW_INPUT_MODE_INIT();
-	ENCODER_SW_INPUT_MODE_INIT();
+	
+	P2M1&=~SET_BIT5;P2M2|=SET_BIT5;
+	
+	P25 = 1;
+	for(i = 0; i<100000; i++){}
+	P25 = 0;
+	for(i = 0; i<100000; i++){}
+	P25 = 1;
 	
 	initI2C();														// Initialize i2c communication
 
+	buttonsInit();
 	slidersInit();
 	encodersInit();
 
