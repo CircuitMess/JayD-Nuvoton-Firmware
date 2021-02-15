@@ -32,7 +32,6 @@ void encodersScan(void){
 		else
 			encoderPos[0]--;
 		
-		//searchList(0x10);
 		addNewNode(0x10, (signed int)(encoderPos[0]-encoderLastPos[0]));
 	
 		encoderLastPos[0] = encoderPos[0];
@@ -48,7 +47,6 @@ void encodersScan(void){
 		else
 			encoderPos[1]--;
 		
-		//searchList(0x11);
 		addNewNode(0x11, (signed int)(encoderPos[1]-encoderLastPos[1]));
 		
 		encoderLastPos[1] = encoderPos[1];
@@ -64,7 +62,6 @@ void encodersScan(void){
 		else
 			encoderPos[2]--;
 		
-		//searchList(0x12);
 		addNewNode(0x12, (signed int)(encoderPos[2]-encoderLastPos[2]));
 		
 		encoderLastPos[2] = encoderPos[2];
@@ -80,7 +77,6 @@ void encodersScan(void){
 		else
 			encoderPos[3]--;
 		
-		//searchList(0x13);
 		addNewNode(0x13, (signed int)(encoderPos[3]-encoderLastPos[3]));
 		
 		encoderLastPos[3] = encoderPos[3];
@@ -96,7 +92,6 @@ void encodersScan(void){
 		else
 			encoderPos[4]--;
 		
-		//searchList(0x14);
 		addNewNode(0x14, (signed int)(encoderPos[4]-encoderLastPos[4]));
 		
 		encoderLastPos[4] = encoderPos[4];
@@ -112,7 +107,6 @@ void encodersScan(void){
 		else
 			encoderPos[5]--;
 		
-		//searchList(0x15);
 		addNewNode(0x15, (signed int)(encoderPos[5]-encoderLastPos[5]));
 		
 		encoderLastPos[5] = encoderPos[5];
@@ -129,7 +123,6 @@ void encodersScan(void){
 		else
 			encoderPos[6]--;
 		
-		//searchList(0x16);
 		addNewNode(0x16, (signed int)(encoderPos[6]-encoderLastPos[6]));
 		
 		encoderLastPos[6] = encoderPos[6];
