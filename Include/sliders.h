@@ -17,6 +17,8 @@
 #define		ADC_ENABLE		ADCCON1&=~SET_BIT0; ADCCON1|=SET_BIT0
 #define		ADC_DISABLE		ADCCON1&=~SET_BIT0
 
+#define		ADC_INIT()		do{ADC_DISABLE; ADC_CLK_DIV; ADC_ACQ;}while(0)
+
 /*	SLIDER INIT	*/
 #define		INIT_ADC_SLIDERS()		do{ADC_DISABLE; P06_Input_Mode; P05_Input_Mode; P04_Input_Mode; P0DIDS&=0x00; P0DIDS|=0x70; }while(0)
 
