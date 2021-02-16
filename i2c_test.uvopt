@@ -211,8 +211,8 @@
       <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\main.c</PathWithFileName>
-      <FilenameWithoutPath>main.c</FilenameWithoutPath>
+      <PathWithFileName>.\Src\buttonHandler.c</PathWithFileName>
+      <FilenameWithoutPath>buttonHandler.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -223,8 +223,8 @@
       <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\buttonHandler.c</PathWithFileName>
-      <FilenameWithoutPath>buttonHandler.c</FilenameWithoutPath>
+      <PathWithFileName>.\Src\encoderHandler.c</PathWithFileName>
+      <FilenameWithoutPath>encoderHandler.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -235,8 +235,8 @@
       <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\sliderHandler.c</PathWithFileName>
-      <FilenameWithoutPath>sliderHandler.c</FilenameWithoutPath>
+      <PathWithFileName>.\Src\listHandler.c</PathWithFileName>
+      <FilenameWithoutPath>listHandler.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -247,8 +247,8 @@
       <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\encoderHandler.c</PathWithFileName>
-      <FilenameWithoutPath>encoderHandler.c</FilenameWithoutPath>
+      <PathWithFileName>.\Src\main.c</PathWithFileName>
+      <FilenameWithoutPath>main.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -259,8 +259,8 @@
       <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\listHandler.c</PathWithFileName>
-      <FilenameWithoutPath>listHandler.c</FilenameWithoutPath>
+      <PathWithFileName>.\Src\sliderHandler.c</PathWithFileName>
+      <FilenameWithoutPath>sliderHandler.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

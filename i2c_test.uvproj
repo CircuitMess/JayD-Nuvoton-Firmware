@@ -382,29 +382,29 @@
               <FilePath>.\STARTUP.A51</FilePath>
             </File>
             <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\main.c</FilePath>
-            </File>
-            <File>
               <FileName>buttonHandler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\buttonHandler.c</FilePath>
-            </File>
-            <File>
-              <FileName>sliderHandler.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\sliderHandler.c</FilePath>
+              <FilePath>.\Src\buttonHandler.c</FilePath>
             </File>
             <File>
               <FileName>encoderHandler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\encoderHandler.c</FilePath>
+              <FilePath>.\Src\encoderHandler.c</FilePath>
             </File>
             <File>
               <FileName>listHandler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\listHandler.c</FilePath>
+              <FilePath>.\Src\listHandler.c</FilePath>
+            </File>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>sliderHandler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\sliderHandler.c</FilePath>
             </File>
           </Files>
         </Group>
