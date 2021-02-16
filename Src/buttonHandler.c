@@ -60,7 +60,7 @@ void buttonsScan(){
 		switchEvent &= 0x0FF7;		
 		addNewNode(3, 0);		
 	}
-	/*
+	
 	if(!ENCODER_SW_2 && !(switchEvent & 0x0010)){
 		
 		switchEvent |= 0x0010;		
@@ -68,7 +68,7 @@ void buttonsScan(){
 	}
 	else if(ENCODER_SW_2 && (switchEvent & 0x0010)){
 			
-		switchEvent &= 0x00F7;		
+		switchEvent &= 0x0FEF;		
 		addNewNode(4, 0);		
 	}
 	
@@ -79,7 +79,7 @@ void buttonsScan(){
 	}
 	else if(ENCODER_SW_3 && (switchEvent & 0x0020)){
 			
-		switchEvent &= 0x00F7;		
+		switchEvent &= 0x0FDF;		
 		addNewNode(5, 0);		
 	}
 	
@@ -90,7 +90,7 @@ void buttonsScan(){
 	}
 	else if(ENCODER_SW_4 && (switchEvent & 0x0040)){
 			
-		switchEvent &= 0x00F7;		
+		switchEvent &= 0x0FBF;		
 		addNewNode(6, 0);	
 	}
 		
@@ -101,7 +101,7 @@ void buttonsScan(){
 	}
 	else if(((P4>>5 & 0x01) == 0x01) && (switchEvent & 0x0080)){
 			
-		switchEvent &= 0x00F7;		
+		switchEvent &= 0x0F7F;		
 		addNewNode(7, 0);	
 	}
 	
@@ -112,7 +112,7 @@ void buttonsScan(){
 	}
 	else if(ENCODER_SW_6 && (switchEvent & 0x0100)){
 			
-		switchEvent &= 0x00F7;		
+		switchEvent &= 0x0EFF;		
 		addNewNode(8, 0);	
-	}*/
+	}
 }
