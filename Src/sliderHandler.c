@@ -56,10 +56,9 @@ void slidersScan(){
 			INIT_ADC_SLIDER2();
 		}
 		
-		clr_EA;
+
+		//set_IDLE;
 		sliderValue = sliderRead();
-		set_EA;
-		set_IDLE;
 		
 		sliderValueEMA[i] = (EMA_ALPHA*sliderValue) + ((1-EMA_ALPHA)*sliderValueEMA[i]);
 	
