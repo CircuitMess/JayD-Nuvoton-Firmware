@@ -14,7 +14,7 @@ void addNewNode(uint8_t devID, uint8_t val){
 		
 		clr_EA;
 	
-		if(nodeNum > 5){
+		if(nodeNum > 50){
 			set_EA;
 			return;
 		}
