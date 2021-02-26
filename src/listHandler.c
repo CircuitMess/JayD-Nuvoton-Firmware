@@ -15,7 +15,10 @@ uint8_t head = 0;
 
 struct Node* giveNode(){
 	struct Node* node = &nodes[head];
-	head = (head+1) % 10;
+
+	if(++head >= 10)
+		return NULL;
+
 	node->nextNode = NULL;
 	return node;
 }
@@ -104,7 +107,9 @@ void freeElement(){
     if(rootNode == lastNode){
         lastNode = NULL;
     }
-    
+
+    if(--head < 0)
+		return;
     
     if(rootNode == sliderNode[0]){
         sliderNode[0] = NULL;
