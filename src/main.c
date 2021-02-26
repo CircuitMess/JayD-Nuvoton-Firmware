@@ -28,8 +28,7 @@ __near bool lastDataTx = false;
 __near bool lastDataRx = false;
 __near uint8_t expectedEventsInQueue = 0;
 
-#define NOOP
-#define __interrupt(x) NOOP
+
 void I2C_ISR(void) __interrupt(6)
 {
     switch (I2STAT)
