@@ -52,7 +52,7 @@ void encodersScan(void){
         previousEncoderState[1] = ENCODER1_A;
     }
     
-    /*
+
     if(previousEncoderState[2] != ENCODER2_A){
     
         if(ENCODER2_B != ENCODER2_A){
@@ -126,5 +126,5 @@ void encodersScan(void){
         
         previousEncoderState[6] = ENCODER6_A;
     }
-*/
+
 }
