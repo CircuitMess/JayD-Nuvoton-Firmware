@@ -10,11 +10,21 @@ __near uint8_t nodeNum = 0;
 struct Node* __near sliderNode[3] = {NULL};
 struct Node* __near lastNode = NULL;
 
+struct Node nodes[10];
+uint8_t head = 0;
+
+struct Node* giveNode(){
+	struct Node* node = &nodes[head];
+	head = (head+1) % 10;
+	node->nextNode = NULL;
+	return node;
+}
+
 void addNewNode(uint8_t devID, uint8_t val){
         
         clr_EA;
     
-        if(nodeNum > 50){
+        if(nodeNum > 10){
             set_EA;
             return;
         }
@@ -32,7 +42,7 @@ void addNewNode(uint8_t devID, uint8_t val){
             
             struct Node *newNode;
             
-            //newNode = (struct Node*)malloc(sizeof(struct Node));
+            newNode = giveNode();
             if(!newNode)
                 return;
             
