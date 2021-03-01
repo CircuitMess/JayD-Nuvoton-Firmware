@@ -12,25 +12,25 @@ struct Node* __near lastNode = NULL;
 
 struct Node nodes[10];
 uint8_t head = 0;
+uint8_t foot = 0;
 
 struct Node* giveNode(){
-	struct Node* node = &nodes[head];
 
-	if(++head >= 10)
+	if((head == foot) && (foot != (head + 1) % 10) && head < 10){
+		struct Node *node = &nodes[head];
+
+		head = (head + 1) % 10;
+
+		node->nextNode = NULL;
+		return node;
+	}
+	else
 		return NULL;
-
-	node->nextNode = NULL;
-	return node;
 }
 
 void addNewNode(uint8_t devID, uint8_t val){
         
         clr_EA;
-    
-        if(nodeNum > 10){
-            set_EA;
-            return;
-        }
 
         if((sliderNode[0] != NULL) && (devID == 0x20)){
             sliderNode[0]->value = val;
@@ -46,14 +46,16 @@ void addNewNode(uint8_t devID, uint8_t val){
             struct Node *newNode;
             
             newNode = giveNode();
-            if(!newNode)
-                return;
-            
+            if(!newNode){
+            	set_EA;
+				return;
+			}
+
+
             newNode->deviceID = devID;
             newNode->value = val;
             newNode->nextNode = NULL;
-            
-            nodeNum++;
+
         
             if(!rootNode){
                 rootNode = lastNode = newNode;
@@ -64,7 +66,6 @@ void addNewNode(uint8_t devID, uint8_t val){
                 lastNode->nextNode = newNode;
                 lastNode = newNode;
             }
-        
             
             if(sliderNode[0] == NULL && devID == 0x20){
                 sliderNode[0] = newNode;
@@ -83,7 +84,7 @@ void addNewNode(uint8_t devID, uint8_t val){
 
 void sendNodeNum(){
     
-    I2DAT = nodeNum;
+    I2DAT = abs(head - foot);
 }
 
 void sendDevID(){
@@ -108,9 +109,7 @@ void freeElement(){
         lastNode = NULL;
     }
 
-    if(--head < 0)
-		return;
-    
+
     if(rootNode == sliderNode[0]){
         sliderNode[0] = NULL;
     }
@@ -121,11 +120,9 @@ void freeElement(){
         sliderNode[2] = NULL;
     }
 
-    
     eventNode = rootNode->nextNode;
-    //free(rootNode);
-    rootNode = eventNode;
-    
-    nodeNum--;
-}
 
+    rootNode = eventNode;
+
+    foot = (foot + 1) % 10;
+}
