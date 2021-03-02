@@ -14,6 +14,7 @@
 #include "list.h"
 
 #define P25_PushPull_Mode P2M1&= ~SET_BIT5;P2M2|= SET_BIT5
+#define P15_PushPull_Mode P1M1&= ~SET_BIT5;P1M2|= SET_BIT5
 
 enum dataReceived{
     statusUpdate,
@@ -169,6 +170,7 @@ void main(void){
     uint32_t i = 0;
 
     P25_PushPull_Mode;
+	P15_PushPull_Mode;
 
     P25 = 1;
     for(i = 0;i<100000;i++){}
@@ -178,14 +180,14 @@ void main(void){
 
     buttonsInit();
     slidersInit();
-    encodersInit();
+    //encodersInit();
 
     initI2C();// Initialize i2c communication
 
     while(1){
 
         buttonsScan();
-        encodersScan();
+        //encodersScan();
         slidersScan();
     }
 }
