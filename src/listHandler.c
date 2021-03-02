@@ -5,21 +5,23 @@
 #include "list.h"
 #include "bool.h"
 
+#define MAX_NODES 10
+
 struct Node* __near rootNode = NULL;
 __near uint8_t nodeNum = 0;
 struct Node* __near sliderNode[3] = {NULL};
 struct Node* __near lastNode = NULL;
 
-struct Node nodes[10];
+__far struct Node nodes[MAX_NODES];
 uint8_t head = 0;
 uint8_t foot = 0;
 
 struct Node* giveNode(){
 
-	if((head == foot) && (foot != (head + 1) % 10) && head < 10){
+	if( foot != (head + 1) % MAX_NODES ){
 		struct Node *node = &nodes[head];
 
-		head = (head + 1) % 10;
+		head = (head + 1) % MAX_NODES;
 
 		node->nextNode = NULL;
 		return node;
@@ -83,8 +85,19 @@ void addNewNode(uint8_t devID, uint8_t val){
 }
 
 void sendNodeNum(){
-    
-    I2DAT = abs(head - foot);
+
+	if(head > foot){
+
+		I2DAT = head - foot;
+
+	}else if (head < foot){
+
+		I2DAT = MAX_NODES - (foot - head);
+
+	}
+	else{
+		I2DAT = 0;
+	}
 }
 
 void sendDevID(){
@@ -124,5 +137,5 @@ void freeElement(){
 
     rootNode = eventNode;
 
-    foot = (foot + 1) % 10;
+    foot = (foot + 1) % MAX_NODES;
 }
