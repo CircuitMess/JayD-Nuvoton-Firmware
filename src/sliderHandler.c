@@ -55,7 +55,6 @@ void slidersScan(){
         else if(i == 2){
             INIT_ADC_SLIDER2();
         }
-        
 
         //set_IDLE;
         sliderValue = sliderRead();
@@ -72,5 +71,35 @@ void slidersScan(){
         ADCCON1&= CLR_BIT0;
     }
 
+}
+
+
+uint8_t getPotValue(uint8_t potID){
+
+	uint8_t sliderValue = 0;
+
+	switch(potID){
+
+		case 0x00:
+			INIT_ADC_SLIDER0();
+			break;
+
+		case 0x01:
+			INIT_ADC_SLIDER1();
+			break;
+
+		case 0x02:
+			INIT_ADC_SLIDER2();
+			break;
+
+		default:
+			break;
+	}
+
+	sliderValue = sliderRead();
+
+	ADCCON1&= CLR_BIT0;
+
+	return sliderValue;
 }
  

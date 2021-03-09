@@ -36,3 +36,4 @@ void slidersInit();
 unsigned int sliderRead(void);
 void slidersScan();
 
+uint8_t getPotValue(uint8_t potID);
