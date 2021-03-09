@@ -16,9 +16,9 @@
 #define P25_PushPull_Mode P2M1&= ~SET_BIT5;P2M2|= SET_BIT5
 
 enum dataReceived{
-    statusUpdate,
-    eventHandler,
-    idVerification
+	statusUpdate,
+	eventHandler,
+	idVerification
 }dataRec;
 
 
@@ -27,6 +27,7 @@ __near uint8_t txDataCnt = 0;
 __near bool lastDataTx = false;
 __near bool lastDataRx = false;
 __near uint8_t expectedEventsInQueue = 0;
+__near uint8_t potID = 0;
 
 
 void I2C_ISR(void) __interrupt(6)
@@ -56,7 +57,7 @@ void I2C_ISR(void) __interrupt(6)
             else if(I2DAT == EVENT_HANDLER){
 
                 dataRec = eventHandler;
-                lastDataRx = false;
+                lastDataRx = true;
             }
             else if(I2DAT == ID_VERIFICATION){
 
@@ -72,11 +73,17 @@ void I2C_ISR(void) __interrupt(6)
                 lastDataRx = true;
             }
 
-            if(I2DAT == EVENT_HANDLER){
+			/*if(dataRec == statusUpdate){
+
+				lastDataRx = true;
+				potID = I2DAT;
+			}*/
+
+            /*if(dataRec == eventHandler){
 
                 lastDataRx = true;
                 expectedEventsInQueue = I2DAT;
-            }
+            }*/
 
             if(lastDataRx){
                 AA = 0;
@@ -89,7 +96,17 @@ void I2C_ISR(void) __interrupt(6)
             break;
 
             case 0x88://  slave receive data NACK
-                AA = 1;
+
+				if(dataRec == eventHandler){
+
+					expectedEventsInQueue = I2DAT;
+				}
+				else if(dataRec == statusUpdate){
+
+					potID = I2DAT;
+				}
+
+            	AA = 1;
                 break;
 
             case 0xA0://  slave transmit repeat start or stop
@@ -104,11 +121,26 @@ void I2C_ISR(void) __interrupt(6)
             case 0xB8://  slave transmit data ACK
 
                 if(dataRec == statusUpdate){
+					/*sendNodeNum();
+					lastDataTx = true;*/
+                	if(txDataCnt >= 2){
 
-                    sendNodeNum();
+						lastDataTx = true;
+						txDataCnt = 0;
+						//dataRec = 0;
+					}
+                	else{
+                		++txDataCnt;
 
-                    lastDataTx = true;
-                    dataRec = 0;
+                		if(txDataCnt == 1){
+							sendNodeNum();
+                		}
+                		else if (txDataCnt == 2){
+							sendPotValue(potID);
+                		}
+
+						lastDataTx = false;
+                	}
                 }
                 else if(dataRec == eventHandler){
 
@@ -116,7 +148,7 @@ void I2C_ISR(void) __interrupt(6)
 
                         lastDataTx = true;
                         txDataCnt = 0;
-                        dataRec = 0;
+                        //dataRec = 0;
                     }
                     else{
 
@@ -136,7 +168,7 @@ void I2C_ISR(void) __interrupt(6)
                 else if(dataRec == idVerification){
 
                     I2DAT = SLAVE_ADDR;
-                    dataRec = 0;
+                    //dataRec = 0;
                     lastDataTx = true;
                 }
 
