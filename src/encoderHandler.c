@@ -30,10 +30,8 @@ void encodersScan(void){
             addNewNode(0x10, 1);
         }
         else{
-        
             addNewNode(0x10, -1);
         }
-    
         previousEncoderState[0] = ENCODER0_A;
     }
     
@@ -45,10 +43,8 @@ void encodersScan(void){
             addNewNode(0x11, 1);
         }
         else{
-        
             addNewNode(0x11, -1);
         }
-        
         previousEncoderState[1] = ENCODER1_A;
     }
     
@@ -60,10 +56,8 @@ void encodersScan(void){
             addNewNode(0x12, 1);
         }
         else{
-        
             addNewNode(0x12, -1);
         }
-        
         previousEncoderState[2] = ENCODER2_A;
     }
     
@@ -75,10 +69,8 @@ void encodersScan(void){
             addNewNode(0x13, 1);
         }
         else{
-        
             addNewNode(0x13, -1);
         }
-        
         previousEncoderState[3] = ENCODER3_A;
     }
     
@@ -90,10 +82,8 @@ void encodersScan(void){
             addNewNode(0x14, 1);
         }
         else{
-        
             addNewNode(0x14, -1);
         }
-        
         previousEncoderState[4] = ENCODER4_A;
     }
     
@@ -105,14 +95,11 @@ void encodersScan(void){
             addNewNode(0x15, 1);
         }
         else{
-        
             addNewNode(0x15, -1);
         }
-        
         previousEncoderState[5] = (P4>>6 && 0x01);
     }
-    
-    
+
     if(previousEncoderState[6] != ENCODER6_A){
     
         if(ENCODER6_B != ENCODER6_A){
@@ -120,10 +107,8 @@ void encodersScan(void){
             addNewNode(0x16, 1);
         }
         else{
-        
             addNewNode(0x16, -1);
         }
-        
         previousEncoderState[6] = ENCODER6_A;
     }
 
