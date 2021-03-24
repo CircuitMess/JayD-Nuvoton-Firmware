@@ -28,9 +28,9 @@
 
 #define EMA_ALPHA 0.05
 
-/*Alpha -> coefficient in the range <0,1> that decides how many samples the EMA algorithm should take into account. 
-    A low a will be very slow to rapid input changes and take many samples into account. A high a will be fast, but 
-    average over fewer samples. You can look at a as kind of a cutoff frequency in a low-pass filter.*/
+/* EMA_ALPHA -> coefficient in the range <0,1> that decides how many samples the EMA algorithm should take into account.
+ A low a will be very slow to rapid input changes and take many samples into account. A high a will be fast, but
+ average over fewer samples. You can look at a as kind of a cutoff frequency in a low-pass filter. */
 
 void slidersInit();
 unsigned int sliderRead(void);
