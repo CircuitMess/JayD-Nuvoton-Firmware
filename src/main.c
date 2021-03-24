@@ -76,18 +76,11 @@ void I2C_ISR(void) __interrupt(6)
 
                 lastDataRx = true;
             }
+			else if(I2DAT == INITIAL_POT_VALUE){
 
-			/*if(dataRec == statusUpdate){
-
+				dataRec = initPotValue;
 				lastDataRx = true;
-				potID = I2DAT;
-			}*/
-
-            /*if(dataRec == eventHandler){
-
-                lastDataRx = true;
-                expectedEventsInQueue = I2DAT;
-            }*/
+			}
 
             if(lastDataRx){
                 AA = 0;
@@ -105,7 +98,7 @@ void I2C_ISR(void) __interrupt(6)
 
 					expectedEventsInQueue = I2DAT;
 				}
-				else if(dataRec == statusUpdate){
+				else if(dataRec == initPotValue){
 
 					potID = I2DAT;
 				}
