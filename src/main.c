@@ -13,15 +13,17 @@
 #include "encoders.h"
 #include "list.h"
 
-#define P25_PushPull_Mode P2M1&= ~SET_BIT5;P2M2|= SET_BIT5
+//#define P25_PushPull_Mode P2M1&= ~SET_BIT5;P2M2|= SET_BIT5
 
+// I2C Event Type
 enum dataReceived{
 	statusUpdate,
 	eventHandler,
 	idVerification
 }dataRec;
 
-
+// __near -> ROM/EPROM/FLASH (18432B)
+// __far  -> EXTERNAL RAM (256B)
 __near uint8_t rxDataCnt = 0;
 __near uint8_t txDataCnt = 0;
 __near bool lastDataTx = false;
@@ -29,7 +31,7 @@ __near bool lastDataRx = false;
 __near uint8_t expectedEventsInQueue = 0;
 __near uint8_t potID = 0;
 
-
+// I2C Interrupt Routine
 void I2C_ISR(void) __interrupt(6)
 {
     switch (I2STAT)
@@ -197,23 +199,28 @@ void I2C_ISR(void) __interrupt(6)
 
 
 void main(void){
-
+/*
     uint32_t i = 0;
 
     P25_PushPull_Mode;
 
+    // test LED for RST
     P25 = 1;
     for(i = 0;i<100000;i++){}
     P25 = 0;
     for(i = 0;i<100000;i++){}
     P25 = 1;
+*/
 
+    // Input initialization
     buttonsInit();
     slidersInit();
     encodersInit();
 
-    initI2C();// Initialize i2c communication
+	// Initialize i2c communication
+    initI2C();
 
+    // Loop
     while(1){
 
         buttonsScan();
@@ -225,17 +232,23 @@ void main(void){
 
 void initI2C(){
 
+	// Open drain mode for i2c
     P23_OpenDrain_Mode;
     P24_OpenDrain_Mode;
 
+    // Initial value is HIGH
     P23 = 1;
     P24 = 1;
 
+    // Enable interrupts
     set_EI2C;
     set_EA;
 
+    // Slave address
     I2ADDR = SLAVE_ADDR<<1;
 
+    // Enable i2c
     set_I2CEN;
+    // set Acknowledge
     set_AA;
 }
