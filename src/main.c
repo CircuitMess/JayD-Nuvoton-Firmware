@@ -19,8 +19,10 @@
 enum dataReceived{
 	statusUpdate,
 	eventHandler,
-	idVerification
-}dataRec;
+	idVerification,
+	initPotValue,
+	null
+}dataRec = null;
 
 // __near -> ROM/EPROM/FLASH (18432B)
 // __far  -> EXTERNAL RAM (256B)
