@@ -206,6 +206,22 @@ void main(void){
     // Loop
     while(1){
 
+    	// bus error state handle
+    	while(SI != 0){
+    		if(I2STAT == 0x00){
+    			STO = 1;
+    		}
+			SI = 0;
+			if(SI!=0){
+				I2CEN = 0;
+				I2CEN = 1;
+				SI = 0;
+				I2CEN = 0;
+			}
+			I2CEN = 1;
+    	}
+
+    	// Input scan
         buttonsScan();
         encodersScan();
         slidersScan();
