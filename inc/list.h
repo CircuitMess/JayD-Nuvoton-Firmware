@@ -10,8 +10,10 @@ typedef struct Node{
 
 void addNewNode(uint8_t devID, uint8_t val);
 void sendNodeNum();
+
 void sendDevID();
 void sendDevValue();
+
 void freeElement();
 
-void sendPotValue(uint8_t potID);
+void sendPotValue(uint8_t _potID);
