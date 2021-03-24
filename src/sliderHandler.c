@@ -37,7 +37,7 @@ unsigned int sliderRead(){
     sliderValue <<= 2;
     sliderValue |= (ADCRL & 0x03);
     
-    return (unsigned int)sliderValue/4;
+    return sliderValue/4;
 }
 
 void slidersScan(){
@@ -56,9 +56,8 @@ void slidersScan(){
             INIT_ADC_SLIDER2();
         }
 
-        //set_IDLE;
         sliderValue = sliderRead();
-        
+
         sliderValueEMA[i] = (EMA_ALPHA*sliderValue) + ((1-EMA_ALPHA)*sliderValueEMA[i]);
     
         if(sliderValueEMA[i] != sliderLastValue[i]){
@@ -80,15 +79,15 @@ uint8_t getPotValue(uint8_t potID){
 
 	switch(potID){
 
-		case 0x00:
+		case 0:
 			INIT_ADC_SLIDER0();
 			break;
 
-		case 0x01:
+		case 1:
 			INIT_ADC_SLIDER1();
 			break;
 
-		case 0x02:
+		case 2:
 			INIT_ADC_SLIDER2();
 			break;
 
@@ -97,9 +96,11 @@ uint8_t getPotValue(uint8_t potID){
 	}
 
 	sliderValue = sliderRead();
+	sliderValueEMA[potID] = (EMA_ALPHA*sliderValue) + ((1-EMA_ALPHA)*sliderValueEMA[potID]);
+	sliderLastValue[potID] = sliderValueEMA[potID];
 
-	ADCCON1&= CLR_BIT0;
+	ADC_DISABLE;
 
-	return sliderValue;
+	return sliderValueEMA[potID];
 }
  
