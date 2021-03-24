@@ -118,26 +118,10 @@ void I2C_ISR(void) __interrupt(6)
             case 0xB8://  slave transmit data ACK
 
                 if(dataRec == statusUpdate){
-					/*sendNodeNum();
-					lastDataTx = true;*/
-                	if(txDataCnt >= 2){
+					sendNodeNum();
+					lastDataTx = true;
+					dataRec = null;
 
-						lastDataTx = true;
-						txDataCnt = 0;
-						//dataRec = 0;
-					}
-                	else{
-                		++txDataCnt;
-
-                		if(txDataCnt == 1){
-							sendNodeNum();
-                		}
-                		else if (txDataCnt == 2){
-							sendPotValue(potID);
-                		}
-
-						lastDataTx = false;
-                	}
                 }
                 else if(dataRec == eventHandler){
 
@@ -145,7 +129,7 @@ void I2C_ISR(void) __interrupt(6)
 
                         lastDataTx = true;
                         txDataCnt = 0;
-                        //dataRec = 0;
+                        dataRec = null;
                     }
                     else{
 
@@ -157,7 +141,6 @@ void I2C_ISR(void) __interrupt(6)
                         }
                         else{
                             sendDevValue();
-
                             freeElement();
                         }
                     }
@@ -165,9 +148,15 @@ void I2C_ISR(void) __interrupt(6)
                 else if(dataRec == idVerification){
 
                     I2DAT = SLAVE_ADDR;
-                    //dataRec = 0;
+                    dataRec = null;
                     lastDataTx = true;
                 }
+				else if(dataRec == initPotValue){
+
+					sendPotValue(potID);
+					dataRec = null;
+					lastDataTx = true;
+				}
 
                 if(lastDataTx){
                     AA = 0;
@@ -176,7 +165,6 @@ void I2C_ISR(void) __interrupt(6)
                 else{
                     AA = 1;
                 }
-
                 break;
 
             case 0xC0://  slave transmit data NACK
