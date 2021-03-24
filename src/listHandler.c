@@ -137,8 +137,10 @@ void freeElement(){
 }
 
 
-void sendPotValue(uint8_t potID){
+void sendPotValue(uint8_t _potID){
+
+	uint8_t potID = _potID;
 
 	I2DAT = getPotValue(potID);
-	//I2DAT = 0x55;
+
 }
