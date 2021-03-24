@@ -6,7 +6,7 @@
 #include "bool.h"
 #include "sliders.h"
 
-#define MAX_NODES 10
+#define MAX_NODES 40
 
 struct Node* __near rootNode = NULL;
 __near uint8_t nodeNum = 0;
