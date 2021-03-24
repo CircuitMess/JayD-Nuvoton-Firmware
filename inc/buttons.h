@@ -9,7 +9,7 @@
 #define P54_Input_Mode P5M1 |= SET_BIT4;P5M2 &= ~SET_BIT4
 #define P51_Input_Mode P5M1 |= SET_BIT1;P5M2 &= ~SET_BIT1
 #define P26_Input_Mode P2M1 |= SET_BIT6;P2M2 &= ~SET_BIT6
-//#define       P45_Input_Mode              P4M1|=SET_BIT5;P4M2&=~SET_BIT5
+//#define P45_Input_Mode P4M1|=SET_BIT5;P4M2&=~SET_BIT5
 #define P20_Input_Mode P2M1 |= SET_BIT0;P2M2 &= ~SET_BIT0
 
 /*  SCHMITT TRIGGER INPUT FOR DEBOUNCING*/
@@ -30,8 +30,10 @@
 #define ENCODER_SW_5 P4^5//  left-down
 #define ENCODER_SW_6 P20//  left-middle
 
+/// Where is P45 defined as Input_Mode ? (only input)
 
-#define ENCODER_SW_INPUT_MODE_INIT() do{P32_Input_Mode;P57_Input_Mode;P54_Input_Mode;P51_Input_Mode;P26_Input_Mode;/*P45_Input_Mode;*/ P20_Input_Mode; ENC_SW_SCHMITT_TRIGGER_INPUT;}while(0)
+#define ENCODER_SW_INPUT_MODE_INIT() do{P32_Input_Mode;P57_Input_Mode;P54_Input_Mode;P51_Input_Mode;P26_Input_Mode; \
+										/*P45_Input_Mode;*/ P20_Input_Mode; ENC_SW_SCHMITT_TRIGGER_INPUT;}while(0)
 
 void buttonsInit();
 void buttonsScan(void);
